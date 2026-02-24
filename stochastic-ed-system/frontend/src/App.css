@@ -1,0 +1,23 @@
+/* App-specific styles - using Tailwind for most styling */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Print styles for PDF export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+  
+  .glass {
+    background: white !important;
+    box-shadow: none !important;
+    border: 1px solid #e0e0e0 !important;
+  }
+}
