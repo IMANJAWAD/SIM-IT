@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, Zap, RefreshCw, Clock, Users, Gauge, AlertTriangle,
@@ -10,8 +10,13 @@ import { LOSDistributionChart, QueueLengthChart, ResourceUtilizationChart, Sensi
 import ComparisonSection from '../components/ComparisonSection';
 import ExportButtons from '../components/ExportButtons';
 import VisualsSection from '../components/VisualsSection';
+import StabilityIntelligencePanel from '../components/StabilityIntelligencePanel';
+import OverloadWarningModal from '../components/OverloadWarningModal';
 import { simulationApi, markovApi, analysisApi } from '../utils/api';
 import logoSp from '../assets/logo-sp.png';
+
+// Service rate constant (μ) - average patients served per hour per doctor
+const SERVICE_RATE = 3.0;
 
 // Consistent color palette
 const COLORS = {
@@ -104,9 +109,24 @@ const Dashboard = () => {
   const [sensitivityData, setSensitivityData] = useState(null);
   const [longTermData, setLongTermData] = useState(null);
   const [error, setError] = useState(null);
+  const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
 
   // Check if we should show results or form
   const showResults = simulationData && !isLoading;
+
+  // Calculate system load factor (ρ = λ / (μ × c))
+  const rho = useMemo(() => {
+    if (SERVICE_RATE <= 0 || params.num_doctors <= 0) return 0;
+    return params.arrival_rate / (SERVICE_RATE * params.num_doctors);
+  }, [params.arrival_rate, params.num_doctors]);
+
+  // Calculate maximum stable arrival rate (λ_max = μ × c)
+  const lambdaMax = useMemo(() => {
+    return SERVICE_RATE * params.num_doctors;
+  }, [params.num_doctors]);
+
+  // Check if arrival rate exceeds stable limit
+  const isOverloaded = params.arrival_rate > lambdaMax;
 
   const handleSliderChange = (key, value) => {
     setParams(prev => ({ ...prev, [key]: value }));
@@ -120,6 +140,21 @@ const Dashboard = () => {
     setError(null);
   };
 
+  // Handle run button click - show warning modal if ρ ≥ 1
+  const handleRunClick = () => {
+    if (rho >= 1) {
+      setIsWarningModalOpen(true);
+    } else {
+      runSimulation();
+    }
+  };
+
+  // Handle modal confirm - close modal and run simulation
+  const handleModalConfirm = () => {
+    setIsWarningModalOpen(false);
+    runSimulation();
+  };
+
   const runSimulation = async () => {
     setIsLoading(true);
     setError(null);
@@ -129,11 +164,11 @@ const Dashboard = () => {
         simulationApi.runSimulation(params),
         markovApi.analyze({
           arrival_rate: params.arrival_rate,
-          service_rate: 3.0,
+          service_rate: SERVICE_RATE,
           num_servers: params.num_doctors,
           max_system_capacity: 20,
         }),
-        analysisApi.getLongTermBehavior(params.arrival_rate, 3.0, params.num_doctors),
+        analysisApi.getLongTermBehavior(params.arrival_rate, SERVICE_RATE, params.num_doctors),
       ]);
 
       setSimulationData(simResult);
@@ -170,7 +205,7 @@ const Dashboard = () => {
             className="min-h-[calc(100vh-4rem)] flex"
           >
             {/* Left Side - Hero Section */}
-            <div className="hidden lg:flex lg:w-1/2 min-h-[calc(100vh-4rem)] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}>
+            <div className="hidden lg:flex lg:w-[30%] min-h-[calc(100vh-4rem)] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}>
               {/* Decorative circles */}
               <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-10 bg-white" />
               <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-10 bg-white" />
@@ -251,31 +286,35 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 min-h-[calc(100vh-4rem)] flex items-center justify-center px-6 py-8 lg:px-12">
+            {/* Right Side - Form + Stability Panel */}
+            <div className="w-full lg:w-[70%] min-h-[calc(100vh-4rem)] flex items-center justify-center px-6 py-8 lg:px-12">
+              {/* Mobile Logo (hidden on desktop) */}
+              <div className="lg:hidden text-center mb-8 w-full">
+                <img 
+                  src={logoSp}
+                  alt="SIM-IT Logo"
+                  className="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-xl object-contain bg-white p-2"
+                />
+                <h1 className="text-3xl font-bold" style={{ color: COLORS.textDark }}>SIM-IT</h1>
+              </div>
+
+              {/* Grid Layout: Config (7) + Stability (5) */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
-                className="w-full max-w-md"
+                className="w-full max-w-7xl mx-auto"
               >
-                {/* Mobile Logo (hidden on desktop) */}
-                <div className="lg:hidden text-center mb-8">
-                  <img 
-                    src={logoSp}
-                    alt="SIM-IT Logo"
-                    className="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-xl object-contain bg-white p-2"
-                  />
-                  <h1 className="text-3xl font-bold" style={{ color: COLORS.textDark }}>SIM-IT</h1>
-                </div>
-
-                {/* Form Card */}
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                  {/* Form Header */}
-                  <div 
-                    className="px-6 py-4 border-b border-gray-100"
-                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}08, ${COLORS.secondary}08)` }}
-                  >
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  {/* Left: Configuration Panel (col-span-6) */}
+                  <div className="lg:col-span-6">
+                    {/* Form Card */}
+                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+                      {/* Form Header */}
+                      <div 
+                        className="px-6 py-4 border-b border-gray-100"
+                        style={{ background: `linear-gradient(135deg, ${COLORS.primary}08, ${COLORS.secondary}08)` }}
+                      >
                     <div className="flex items-center gap-3">
                       <div 
                         className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -301,7 +340,15 @@ const Dashboard = () => {
                         transition={{ delay: 0.4 + index * 0.05 }}
                       >
                         <div className="flex justify-between text-sm">
-                          <label className="font-medium text-sm" style={{ color: COLORS.textDark }}>{label}</label>
+                          <label className="font-medium text-sm" style={{ color: COLORS.textDark }}>
+                            {label}
+                            {/* Show max stable value for arrival rate */}
+                            {key === 'arrival_rate' && (
+                              <span className="ml-2 text-xs font-normal" style={{ color: COLORS.textMuted }}>
+                                (max stable: {lambdaMax.toFixed(1)}/hr)
+                              </span>
+                            )}
+                          </label>
                           <span 
                             className="font-bold tabular-nums px-2 py-0.5 rounded-md text-xs"
                             style={{ background: COLORS.accent, color: COLORS.primary }}
@@ -309,7 +356,7 @@ const Dashboard = () => {
                             {params[key]}{unit}
                           </span>
                         </div>
-                        <input
+                        <motion.input
                           type="range"
                           min={min}
                           max={max}
@@ -318,7 +365,34 @@ const Dashboard = () => {
                           onChange={(e) => handleSliderChange(key, parseFloat(e.target.value))}
                           className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#0077b6]"
                           style={{ background: `linear-gradient(to right, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}
+                          animate={key === 'arrival_rate' && isOverloaded ? { x: [0, -3, 3, -3, 3, 0] } : {}}
+                          transition={{ duration: 0.3 }}
                         />
+                        {/* Inline validation for arrival rate */}
+                        {key === 'arrival_rate' && (
+                          <AnimatePresence>
+                            {isOverloaded ? (
+                              <motion.p
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="text-xs pt-1"
+                                style={{ color: COLORS.primary }}
+                              >
+                                Current configuration leads to system overload.
+                              </motion.p>
+                            ) : (
+                              <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-xs pt-1"
+                                style={{ color: COLORS.textMuted }}
+                              >
+                                Maximum stable arrival rate with current doctors: {lambdaMax.toFixed(1)} patients/hour
+                              </motion.p>
+                            )}
+                          </AnimatePresence>
+                        )}
                       </motion.div>
                     ))}
                   </div>
@@ -345,7 +419,7 @@ const Dashboard = () => {
                     <motion.button
                       whileHover={{ scale: 1.02, boxShadow: '0 12px 30px -5px rgba(0, 119, 182, 0.4)' }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={runSimulation}
+                      onClick={handleRunClick}
                       disabled={isLoading}
                       className="w-full py-3.5 text-white text-base rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-60"
                       style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
@@ -363,6 +437,17 @@ const Dashboard = () => {
                         </>
                       )}
                     </motion.button>
+                  </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Live Stability Intelligence Panel (col-span-6) */}
+                  <div className="lg:col-span-6">
+                    <StabilityIntelligencePanel
+                      arrivalRate={params.arrival_rate}
+                      serviceRate={SERVICE_RATE}
+                      numDoctors={params.num_doctors}
+                    />
                   </div>
                 </div>
               </motion.div>
@@ -560,6 +645,14 @@ const Dashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Overload Warning Modal */}
+      <OverloadWarningModal
+        isOpen={isWarningModalOpen}
+        onClose={() => setIsWarningModalOpen(false)}
+        onConfirm={handleModalConfirm}
+        rho={rho}
+      />
     </div>
   );
 };
