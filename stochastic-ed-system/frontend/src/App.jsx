@@ -3,7 +3,11 @@ import { AnimatePresence } from 'framer-motion';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { Landing, Login, Signup, Dashboard, About } from './pages';
+import { Landing, Login, Signup, Dashboard, About, JacksonNetwork, NonHomogeneousPoissonProcess } from './pages';
+import JacksonResult from './pages/jackson-result';
+import NHPPResults from './pages/nhpp-results.jsx';
+import PriorityQueuing from './pages/PriorityQueuing';
+import PriorityQueueResults from './pages/priorityqueue-results';
 
 import './App.css';
 
@@ -69,6 +73,66 @@ const AnimatedRoutes = () => {
           element={
             <Layout>
               <About />
+            </Layout>
+          }
+        />
+
+        {/* Jackson Network Page */}
+        <Route
+          path="/jackson-network"
+          element={
+            <Layout>
+              <JacksonNetwork />
+            </Layout>
+          }
+        />
+
+        {/* Jackson Results Page */}
+        <Route
+          path="/jackson-results"
+          element={
+            <Layout>
+              <JacksonResult />
+            </Layout>
+          }
+        />
+
+        {/* Non-Homogeneous Poisson Process Page */}
+        <Route
+          path="/poisson-process"
+          element={
+            <Layout>
+              <NonHomogeneousPoissonProcess />
+            </Layout>
+          }
+        />
+
+        {/* NHPP Results Page */}
+        <Route
+          path="/nhpp-results"
+          element={
+            <Layout>
+              <NHPPResults />
+            </Layout>
+          }
+        />
+
+        {/* Priority Queuing Page */}
+        <Route
+          path="/priority-queuing"
+          element={
+            <Layout>
+              <PriorityQueuing />
+            </Layout>
+          }
+        />
+
+        {/* Priority Queue Results Page */}
+        <Route
+          path="/priorityqueue-results"
+          element={
+            <Layout>
+              <PriorityQueueResults />
             </Layout>
           }
         />

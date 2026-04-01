@@ -20,6 +20,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.simulation_routes import router as simulation_router
 from routes.markov_routes import router as markov_router
 from routes.analysis_routes import router as analysis_router
+from routes.jackson_routes import router as jackson_router
+from routes.nhpp_routes import router as nhpp_router
+from routes.priority_routes import router as priority_router
 
 # Create FastAPI application
 app = FastAPI(
@@ -58,6 +61,9 @@ app.add_middleware(
 app.include_router(simulation_router)
 app.include_router(markov_router)
 app.include_router(analysis_router)
+app.include_router(jackson_router)
+app.include_router(nhpp_router)
+app.include_router(priority_router)
 
 @app.get("/")
 async def root():
@@ -72,6 +78,10 @@ async def root():
             "sensitivity": "/analysis/sensitivity",
             "comparison": "/analysis/compare",
             "long_term": "/analysis/long-term-behavior",
+            "jackson_network": "/jackson/simulate-jackson",
+            "nhpp_simulation": "/nhpp/simulate-nhpp",
+            "nhpp_timeseries": "/nhpp/simulate-timeseries",
+            "priority_queue": "/simulate-priority-queue",
             "docs": "/docs"
         }
     }
