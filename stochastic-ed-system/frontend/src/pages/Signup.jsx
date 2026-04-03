@@ -53,6 +53,7 @@ const Signup = () => {
   };
 
   const triggerSuccessAnimation = () => {
+    localStorage.setItem('simitAuth', 'true');
     setShowConfetti(true);
     setShowSuccessMessage(true);
     

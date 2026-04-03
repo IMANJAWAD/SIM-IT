@@ -32,6 +32,11 @@ const TRIAGE_COLORS = {
   white: '#ffffff',
 };
 
+const UI_COLORS = {
+  primary: '#0077b6',
+  secondary: '#00b4d8',
+};
+
 // Predefined scenarios for triage distribution
 const TRIAGE_SCENARIOS = {
   normal: {
@@ -440,7 +445,7 @@ export default function PriorityQueuing() {
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <div 
                     className="p-4 rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${TRIAGE_COLORS.level1}, ${TRIAGE_COLORS.level2})` }}
+                    style={{ background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }}
                   >
                     <Activity className="w-8 h-8 text-white" />
                   </div>
@@ -473,11 +478,11 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <TrendingUp className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <TrendingUp className="w-6 h-6 text-[#0077b6]" />
                     Section 1: Population Distribution
                   </h2>
                   <p className="text-gray-600 mt-1">
@@ -591,7 +596,7 @@ export default function PriorityQueuing() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <div className="font-semibold text-gray-800 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-purple-600" />
+                      <Users className="w-4 h-4 text-[#0077b6]" />
                       Waiting Room Preview
                     </div>
                     <div className="text-sm text-gray-600">Live visualization of patient distribution</div>
@@ -629,10 +634,10 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <Settings className="w-6 h-6 text-purple-600" />
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <Settings className="w-6 h-6 text-[#0077b6]" />
                   Section 2: Priority Details Grid
                 </h2>
                 <p className="text-gray-600 mt-1">
@@ -742,10 +747,10 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.3 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <Shield className="w-6 h-6 text-indigo-600" />
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <Shield className="w-6 h-6 text-[#0077b6]" />
                   Section 3: Logic Settings
                 </h2>
                 <p className="text-gray-600 mt-1">
@@ -756,7 +761,7 @@ export default function PriorityQueuing() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 
                 {/* Preemption Toggle */}
-                <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                <div className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <div className="font-bold text-blue-800 text-lg flex items-center gap-2">
@@ -822,8 +827,8 @@ export default function PriorityQueuing() {
                   </div>
                 </div>
                 {/* Scenario Presets */}
-                <div className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                  <h3 className="text-lg font-bold text-purple-800 mb-4 flex items-center gap-2">
+                <div className="p-6 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border-2 border-blue-200">
+                  <h3 className="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5" />
                     Emergency Scenarios
                   </h3>
@@ -836,7 +841,7 @@ export default function PriorityQueuing() {
                         onClick={() => applyScenario(key)}
                         className={`p-3 rounded-xl border-2 text-left transition-all ${
                           selectedScenario === key
-                            ? 'border-purple-500 bg-purple-100 shadow-lg'
+                            ? 'border-blue-500 bg-blue-100 shadow-lg'
                             : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
                         }`}
                       >
@@ -894,7 +899,7 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.4 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
               <div className="text-center">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                   <motion.button
@@ -904,7 +909,7 @@ export default function PriorityQueuing() {
                     disabled={!isValidDistribution}
                     className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
                       isValidDistribution
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl'
+                        ? 'bg-gradient-to-r from-[#0077b6] to-[#00b4d8] text-white shadow-lg hover:shadow-xl'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -993,8 +998,8 @@ export default function PriorityQueuing() {
               transition={{ delay: 0.5 }}
               className="mb-8"
             >
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+              <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                   <Activity className="w-6 h-6 text-green-600" />
                   {preemptionEnabled ? 'Preemptive' : 'Non-Preemptive'} Priority Queue Simulation Active
                 </h3>
@@ -1052,12 +1057,12 @@ export default function PriorityQueuing() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
-                    <div className="font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
+                    <div className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
                       <TrendingUp className="w-5 h-5" />
                       Live Performance Metrics
                     </div>
-                    <div className="text-sm text-purple-700 space-y-1">
+                    <div className="text-sm text-blue-700 space-y-1">
                       <div>• Avg P1 Wait: {preemptionEnabled ? '0.5' : '2.1'} min</div>
                       <div>• Avg P2 Wait: {preemptionEnabled ? '3.2' : '8.7'} min</div>
                       <div>• Avg P5 Wait: {preemptionEnabled ? '45.8' : '28.3'} min</div>

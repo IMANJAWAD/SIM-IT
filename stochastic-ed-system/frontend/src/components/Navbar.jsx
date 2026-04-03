@@ -7,14 +7,23 @@ import logoSp from '../assets/logo-sp.png';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const isAuthenticated = localStorage.getItem('simitAuth') === 'true';
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Dashboard', path: '/dashboard' },
+  const publicLinks = [
     { name: 'About', path: '/about' },
     { name: 'Login', path: '/login' },
     { name: 'Signup', path: '/signup' },
   ];
+
+  const privateLinks = [
+    { name: 'Jackson Model', path: '/jackson-network' },
+    { name: 'Poisson Process', path: '/poisson-process' },
+    { name: 'Priority Queuing', path: '/priority-queuing' },
+  ];
+
+  const navLinks = isAuthenticated
+    ? [...publicLinks, ...privateLinks]
+    : publicLinks;
 
   const isActive = (path) => location.pathname === path;
 
