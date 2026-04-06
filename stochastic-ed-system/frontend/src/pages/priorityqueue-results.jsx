@@ -95,8 +95,8 @@ export default function PriorityQueueResults() {
       <div className="min-h-screen pt-16 flex items-center justify-center" 
            style={{ background: TRIAGE_COLORS.background }}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <div className="text-xl font-semibold text-gray-700">Loading Priority Queue Results...</div>
+          <div className="w-16 h-16 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: UI_COLORS.secondary, borderTopColor: 'transparent' }} />
+          <div className="text-xl font-semibold" style={{ color: UI_COLORS.textDark }}>Loading Priority Queue Results...</div>
         </div>
       </div>
     );
@@ -107,11 +107,12 @@ export default function PriorityQueueResults() {
       <div className="min-h-screen pt-16 flex items-center justify-center" 
            style={{ background: TRIAGE_COLORS.background }}>
         <div className="text-center">
-          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <div className="text-xl font-semibold text-gray-700 mb-4">{error}</div>
+          <XCircle className="w-16 h-16 mx-auto mb-4" style={{ color: UI_COLORS.alertHint }} />
+          <div className="text-xl font-semibold mb-4" style={{ color: UI_COLORS.textDark }}>{error}</div>
           <button
             onClick={goBack}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 text-white rounded-lg transition-colors"
+            style={{ background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }}
           >
             Return to Priority Queue Setup
           </button>
@@ -152,7 +153,7 @@ export default function PriorityQueueResults() {
           >
             <div className="p-1">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                   <button
                     onClick={goBack}
                     className="p-3 rounded-xl transition-colors"
@@ -215,12 +216,12 @@ export default function PriorityQueueResults() {
               
               {/* Stability Warnings */}
               {results?.validation?.stability_warnings?.length > 0 && (
-                <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
-                  <h3 className="font-bold text-red-800 mb-2 flex items-center gap-2">
+                <div className="mb-6 p-4 rounded-xl border" style={{ background: `${UI_COLORS.alertHint}10`, borderColor: `${UI_COLORS.alertHint}30` }}>
+                  <h3 className="font-bold mb-2 flex items-center gap-2" style={{ color: UI_COLORS.alertHint }}>
                     <AlertTriangle className="w-5 h-5" />
                     System Stability Warnings
                   </h3>
-                  <ul className="text-sm text-red-700 space-y-1">
+                  <ul className="text-sm space-y-1" style={{ color: UI_COLORS.alertHint }}>
                     {results.validation.stability_warnings.map((warning, index) => (
                       <li key={index}>• {warning}</li>
                     ))}
@@ -229,40 +230,32 @@ export default function PriorityQueueResults() {
               )}
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <div className="text-sm text-blue-600 mb-1">Total Arrival Rate</div>
-                  <div className="text-2xl font-bold text-blue-800">
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <div className="text-sm mb-1" style={{ color: UI_COLORS.textMuted }}>Total Arrival Rate</div>
+                  <div className="text-2xl font-bold" style={{ color: UI_COLORS.textDark }}>
                     {results?.parameters?.total_arrival_rate} <span className="text-sm">patients/hour</span>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                  <div className="text-sm text-green-600 mb-1">Service Rate per Doctor</div>
-                  <div className="text-2xl font-bold text-green-800">
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <div className="text-sm mb-1" style={{ color: UI_COLORS.textMuted }}>Service Rate per Doctor</div>
+                  <div className="text-2xl font-bold" style={{ color: UI_COLORS.textDark }}>
                     {results?.parameters?.service_rate_per_doctor?.toFixed(1)} <span className="text-sm">patients/hour</span>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                  <div className="text-sm text-purple-600 mb-1">Number of Doctors</div>
-                  <div className="text-2xl font-bold text-purple-800">
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <div className="text-sm mb-1" style={{ color: UI_COLORS.textMuted }}>Number of Doctors</div>
+                  <div className="text-2xl font-bold" style={{ color: UI_COLORS.textDark }}>
                     {results?.parameters?.num_doctors} <span className="text-sm">servers</span>
                   </div>
                 </div>
                 
-                <div className={`p-4 rounded-xl border-2 ${
-                  results?.validation?.system_stable 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
-                  <div className={`text-sm mb-1 ${
-                    results?.validation?.system_stable ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                <div className="p-4 rounded-xl border-2" style={{ background: results?.validation?.system_stable ? '#ecf8f5' : `${UI_COLORS.alertHint}10`, borderColor: results?.validation?.system_stable ? '#b7e3dc' : `${UI_COLORS.alertHint}30` }}>
+                  <div className="text-sm mb-1" style={{ color: results?.validation?.system_stable ? '#1d7f73' : UI_COLORS.alertHint }}>
                     System Utilization
                   </div>
-                  <div className={`text-2xl font-bold ${
-                    results?.validation?.system_stable ? 'text-green-800' : 'text-red-800'
-                  }`}>
+                  <div className="text-2xl font-bold" style={{ color: results?.validation?.system_stable ? '#1d7f73' : UI_COLORS.alertHint }}>
                     {results?.validation?.utilization_percent}%
                   </div>
                 </div>
@@ -270,21 +263,21 @@ export default function PriorityQueueResults() {
 
               {/* Capacity Analysis */}
               {results?.validation?.recommendations && (
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                  <h3 className="font-bold text-yellow-800 mb-2">Capacity Analysis & Recommendations</h3>
+                <div className="mt-6 p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <h3 className="font-bold mb-2" style={{ color: UI_COLORS.textDark }}>Capacity Analysis & Recommendations</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div>
-                      <div className="text-yellow-700">
+                      <div style={{ color: UI_COLORS.textMuted }}>
                         <strong>Current Capacity:</strong> {results.validation.recommendations.current_capacity} patients/hour
                       </div>
                     </div>
                     <div>
-                      <div className="text-yellow-700">
+                      <div style={{ color: UI_COLORS.textMuted }}>
                         <strong>Minimum Doctors Needed:</strong> {results.validation.recommendations.min_doctors_needed}
                       </div>
                     </div>
                     <div>
-                      <div className="text-yellow-700">
+                      <div style={{ color: UI_COLORS.textMuted }}>
                         <strong>Capacity Gap:</strong> {results.validation.recommendations.capacity_gap.toFixed(1)} patients/hour
                       </div>
                     </div>
@@ -294,7 +287,7 @@ export default function PriorityQueueResults() {
 
               {/* Priority Distribution */}
               <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Priority Level Distribution</h3>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: UI_COLORS.textDark }}>Priority Level Distribution</h3>
                 <div className="grid grid-cols-5 gap-3">
                   {results?.parameters?.distributions?.map((dist, index) => (
                     <div key={index} className="text-center p-3 rounded-lg border-2" 
@@ -303,7 +296,7 @@ export default function PriorityQueueResults() {
                       <div className="font-bold" style={{ color: TRIAGE_LEVELS[index]?.color }}>
                         {(dist * 100).toFixed(1)}%
                       </div>
-                      <div className="text-xs text-gray-600">P{index + 1}</div>
+                      <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>P{index + 1}</div>
                     </div>
                   ))}
                 </div>
@@ -328,12 +321,12 @@ export default function PriorityQueueResults() {
               
               {/* Simulation Status Notice */}
               {!results?.simulation?.simulation_run && (
-                <div className="mb-6 p-4 bg-orange-50 border-2 border-orange-200 rounded-xl">
-                  <h3 className="font-bold text-orange-800 mb-2 flex items-center gap-2">
+                <div className="mb-6 p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <h3 className="font-bold mb-2 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
                     <Info className="w-5 h-5" />
                     Simulation Status
                   </h3>
-                  <p className="text-sm text-orange-700">
+                  <p className="text-sm" style={{ color: UI_COLORS.textMuted }}>
                     Simulation was skipped due to system instability (utilization ≥ 120%). 
                     Only theoretical results are shown. For accurate simulation validation, 
                     reduce arrival rate or increase number of doctors.
@@ -344,7 +337,7 @@ export default function PriorityQueueResults() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Wait Time Comparison Chart */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-3">Wait Times (Minutes)</h3>
+                  <h3 className="text-lg font-semibold mb-3" style={{ color: UI_COLORS.textDark }}>Wait Times (Minutes)</h3>
                   {comparisonData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={comparisonData}>
@@ -365,7 +358,7 @@ export default function PriorityQueueResults() {
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="h-300 flex items-center justify-center text-gray-500">
+                    <div className="h-300 flex items-center justify-center" style={{ color: UI_COLORS.textMuted }}>
                       No comparison data available
                     </div>
                   )}
@@ -373,7 +366,7 @@ export default function PriorityQueueResults() {
 
                 {/* Error Analysis or System Status */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                  <h3 className="text-lg font-semibold mb-3" style={{ color: UI_COLORS.textDark }}>
                     {results?.simulation?.simulation_run ? 'Accuracy Analysis' : 'System Analysis'}
                   </h3>
                   {results?.simulation?.simulation_run && comparisonData.length > 0 ? (
@@ -389,9 +382,9 @@ export default function PriorityQueueResults() {
                   ) : (
                     <div className="h-300 flex items-center justify-center">
                       <div className="text-center p-6">
-                        <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-                        <div className="text-lg font-semibold text-gray-700 mb-2">System Unstable</div>
-                        <div className="text-sm text-gray-600">
+                        <AlertTriangle className="w-16 h-16 mx-auto mb-4" style={{ color: UI_COLORS.alertHint }} />
+                        <div className="text-lg font-semibold mb-2" style={{ color: UI_COLORS.textDark }}>System Unstable</div>
+                        <div className="text-sm" style={{ color: UI_COLORS.textMuted }}>
                           Utilization: {results?.validation?.utilization_percent}%<br/>
                           Simulation accuracy not reliable<br/>
                           for unstable systems
@@ -454,8 +447,8 @@ export default function PriorityQueueResults() {
                   </table>
                 </div>
                 
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-xs text-blue-700">
+                <div className="mt-4 p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>
                     <strong>Formula:</strong> {results?.parameters?.preemptive 
                       ? 'Wᵢ = E[R] / (1-σᵢ₋₁)' 
                       : 'Wᵢ = E[R] / ((1-σᵢ₋₁)(1-σᵢ))'}
@@ -503,8 +496,8 @@ export default function PriorityQueueResults() {
                   </table>
                 </div>
                 
-                <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="text-xs text-green-700">
+                <div className="mt-4 p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>
                     <strong>Simulation:</strong> {results?.simulation?.num_replications} replications, 
                     {results?.simulation?.simulation_time_mins} minutes each
                   </div>
@@ -544,8 +537,8 @@ export default function PriorityQueueResults() {
                 </ScatterChart>
               </ResponsiveContainer>
               
-              <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="text-sm text-orange-700">
+              <div className="mt-4 p-4 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                <div className="text-sm" style={{ color: UI_COLORS.textMuted }}>
                   <strong>Accuracy Note:</strong> {results?.validation?.accuracy_note}
                 </div>
               </div>
@@ -560,19 +553,19 @@ export default function PriorityQueueResults() {
           >
             <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
-                <Award className="w-6 h-6 text-gold-600" />
+                <Award className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                 Performance Summary & Insights
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 {/* System Performance */}
-                <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                  <h3 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                    <TrendingUp className="w-5 h-5" style={{ color: UI_COLORS.primary }} />
                     System Performance
                   </h3>
-                  <div className="space-y-2 text-sm text-blue-700">
+                  <div className="space-y-2 text-sm" style={{ color: UI_COLORS.textMuted }}>
                     <div>• Utilization: {(results?.validation?.system_utilization * 100).toFixed(1)}%</div>
                     <div>• System Status: {results?.validation?.system_stable ? 'Stable' : 'Unstable'}</div>
                     <div>• Queue Discipline: {results?.parameters?.preemptive ? 'Preemptive' : 'Non-Preemptive'}</div>
@@ -581,12 +574,12 @@ export default function PriorityQueueResults() {
                 </div>
 
                 {/* Critical Insights */}
-                <div className="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border border-red-200">
-                  <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.alertHint}10`, borderColor: `${UI_COLORS.alertHint}30` }}>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: UI_COLORS.alertHint }}>
                     <AlertTriangle className="w-5 h-5" />
                     Critical Insights
                   </h3>
-                  <div className="space-y-2 text-sm text-red-700">
+                  <div className="space-y-2 text-sm" style={{ color: UI_COLORS.alertHint }}>
                     {results?.comparison?.map((comp, index) => {
                       if (index === 0) { // P1 - Critical patients
                         return (
@@ -603,12 +596,12 @@ export default function PriorityQueueResults() {
                 </div>
 
                 {/* Simulation Quality */}
-                <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                  <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
+                <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                    <CheckCircle className="w-5 h-5" style={{ color: UI_COLORS.primary }} />
                     Simulation Quality & Accuracy
                   </h3>
-                  <div className="space-y-2 text-sm text-green-700">
+                  <div className="space-y-2 text-sm" style={{ color: UI_COLORS.textMuted }}>
                     <div>• Replications: {results?.simulation?.quality_metrics?.replications_used || results?.simulation?.num_replications}</div>
                     <div>• Simulation Time: {results?.simulation?.quality_metrics?.simulation_hours?.toFixed(1) || (results?.simulation?.simulation_time_mins / 60)?.toFixed(1)} hours</div>
                     <div>• Warm-up Period: {results?.simulation?.quality_metrics?.warmup_hours || 8} hours</div>
@@ -618,13 +611,9 @@ export default function PriorityQueueResults() {
                         return sum + (typeof comp.error_percent === 'number' ? comp.error_percent : 0);
                       }, 0) / (results?.comparison?.length || 1)
                     }%</div>
-                    <div className={`font-semibold ${
-                      (results?.comparison?.reduce((sum, comp) => {
+                    <div className="font-semibold" style={{ color: (results?.comparison?.reduce((sum, comp) => {
                         return sum + (typeof comp.error_percent === 'number' ? comp.error_percent : 0);
-                      }, 0) / (results?.comparison?.length || 1)) < 5 
-                        ? 'text-green-800' 
-                        : 'text-orange-800'
-                    }`}>
+                      }, 0) / (results?.comparison?.length || 1)) < 5 ? '#1d7f73' : UI_COLORS.alertHint }}>
                       • Target: &lt;5% for CEP validation {
                         (results?.comparison?.reduce((sum, comp) => {
                           return sum + (typeof comp.error_percent === 'number' ? comp.error_percent : 0);
@@ -636,12 +625,12 @@ export default function PriorityQueueResults() {
               </div>
 
               {/* Mathematical Validation */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
-                <h3 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
-                  <Calculator className="w-5 h-5" />
+              <div className="mt-6 p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                  <Calculator className="w-5 h-5" style={{ color: UI_COLORS.primary }} />
                   Mathematical Validation
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" style={{ color: UI_COLORS.textMuted }}>
                   <div>
                     <div className="font-semibold mb-2">Theoretical Model:</div>
                     <ul className="space-y-1">

@@ -520,13 +520,11 @@ export default function PriorityQueuing() {
                         >
                           <IconComponent className="w-6 h-6" style={{ color: level.color }} />
                         </div>
-                        <div className="text-lg mb-1">{level.emoji}</div>
-                        
                         {/* Mathematical Notation */}
-                        <div className="font-bold text-gray-800 text-sm mb-1">
+                        <div className="font-bold text-sm mb-1" style={{ color: UI_COLORS.textDark }}>
                           λ₍{index + 1}₎ = {triageDistribution[level.id]}%
                         </div>
-                        <div className="text-xs text-gray-600">{level.shortName}</div>
+                        <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>{level.shortName}</div>
                       </div>
 
                       {/* Percentage Slider */}
@@ -555,8 +553,8 @@ export default function PriorityQueuing() {
               </div>
               {/* Multi-Segment Distribution Bar */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  📊 Visual Distribution: ∑λᵢ = 100%
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                  Visual Distribution: ∑λᵢ = 100%
                 </h3>
                 <div className="relative h-12 bg-gray-200 rounded-xl overflow-hidden shadow-inner">
                   {TRIAGE_LEVELS.map((level, index) => {
@@ -591,11 +589,11 @@ export default function PriorityQueuing() {
               <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <div className="font-semibold text-gray-800 flex items-center gap-2">
+                    <div className="font-semibold flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
                       <Users className="w-4 h-4" style={{ color: UI_COLORS.primary }} />
                       Waiting Room Preview
                     </div>
-                    <div className="text-sm text-gray-600">Live visualization of patient distribution</div>
+                        <div className="text-sm" style={{ color: UI_COLORS.textMuted }}>Live visualization of patient distribution</div>
                   </div>
                   <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full border">
                     20 patients
@@ -648,8 +646,8 @@ export default function PriorityQueuing() {
                     <motion.div
                       key={level.id}
                       whileHover={{ scale: 1.02 }}
-                      className="border-2 rounded-xl p-5 shadow-md hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50"
-                      style={{ borderColor: level.color }}
+                      className="border-2 rounded-xl p-5 shadow-sm hover:shadow-md transition-all bg-white"
+                      style={{ borderColor: UI_COLORS.border }}
                     >
                       {/* Header */}
                       <div className="flex items-center gap-3 mb-4">
@@ -660,34 +658,34 @@ export default function PriorityQueuing() {
                           <IconComponent className="w-6 h-6" style={{ color: level.color }} />
                         </div>
                         <div>
-                          <div className="font-bold text-gray-800">
-                            P{index + 1} ({level.emoji})
+                          <div className="font-bold" style={{ color: UI_COLORS.textDark }}>
+                            P{index + 1}
                           </div>
-                          <div className="text-sm text-gray-600">{level.shortName}</div>
+                          <div className="text-sm" style={{ color: UI_COLORS.textMuted }}>{level.shortName}</div>
                         </div>
                       </div>
                       {/* Mathematical Parameters */}
                       <div className="space-y-4">
                         {/* Arrival Rate */}
-                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-blue-800">
+                            <span className="text-sm font-semibold" style={{ color: UI_COLORS.textDark }}>
                               λ₍{index + 1}₎ = {triageDistribution[level.id]}%
                             </span>
-                            <span className="text-xs text-blue-600">Arrival Rate</span>
+                            <span className="text-xs" style={{ color: UI_COLORS.textMuted }}>Arrival Rate</span>
                           </div>
-                          <div className="text-xs text-blue-700">
+                          <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>
                             Population distribution percentage
                           </div>
                         </div>
 
                         {/* Service Time */}
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-green-800">
+                            <span className="text-sm font-semibold" style={{ color: UI_COLORS.textDark }}>
                               Avg Service: {serviceTimes[level.id]}m
                             </span>
-                            <span className="text-xs text-green-600">μ₍{index + 1}₎</span>
+                            <span className="text-xs" style={{ color: UI_COLORS.textMuted }}>μ₍{index + 1}₎</span>
                           </div>
                           <input
                             type="range"
@@ -700,30 +698,30 @@ export default function PriorityQueuing() {
                               background: `linear-gradient(to right, ${level.color} 0%, ${level.color} ${(serviceTimes[level.id] - 5) / 115 * 100}%, #e5e7eb ${(serviceTimes[level.id] - 5) / 115 * 100}%, #e5e7eb 100%)`
                             }}
                           />
-                          <div className="text-xs text-green-700 mt-1">
+                          <div className="text-xs mt-1" style={{ color: UI_COLORS.textMuted }}>
                             Service rate: μ₍{index + 1}₎ = {(60 / serviceTimes[level.id]).toFixed(2)} patients/hour
                           </div>
                         </div>
                         {/* Target Time with Clock */}
-                        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-orange-600" />
-                              <span className="text-sm font-semibold text-orange-800">
+                              <Clock className="w-4 h-4" style={{ color: UI_COLORS.primary }} />
+                              <span className="text-sm font-semibold" style={{ color: UI_COLORS.textDark }}>
                                 Target: {level.targetTime}
                               </span>
                             </div>
-                            <span className="text-xs text-orange-600">Clinical Goal</span>
+                            <span className="text-xs" style={{ color: UI_COLORS.textMuted }}>Clinical Goal</span>
                           </div>
-                          <div className="text-xs text-orange-700">
+                          <div className="text-xs" style={{ color: UI_COLORS.textMuted }}>
                             Maximum acceptable wait time
                           </div>
                         </div>
 
                         {/* Clinical Examples */}
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="text-xs font-semibold text-gray-700 mb-2">Clinical Examples:</div>
-                          <ul className="text-xs text-gray-600 space-y-1">
+                        <div className="p-3 rounded-lg border" style={{ background: `${UI_COLORS.secondary}08`, borderColor: UI_COLORS.border }}>
+                          <div className="text-xs font-semibold mb-2" style={{ color: UI_COLORS.textDark }}>Clinical Examples:</div>
+                          <ul className="text-xs space-y-1" style={{ color: UI_COLORS.textMuted }}>
                             {level.examples.slice(0, 2).map((example, idx) => (
                               <li key={idx}>• {example}</li>
                             ))}
@@ -757,14 +755,14 @@ export default function PriorityQueuing() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 
                 {/* Preemption Toggle */}
-                <div className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200">
+                <div className="p-6 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <div className="font-bold text-blue-800 text-lg flex items-center gap-2">
+                        <div className="font-bold text-lg flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
                         <Zap className="w-5 h-5" />
                         Enable Preemptive Service
                       </div>
-                      <div className="text-sm text-blue-600 mt-1">
+                        <div className="text-sm mt-1" style={{ color: UI_COLORS.textMuted }}>
                         {preemptionEnabled ? 'Preemptive Priority Queue (PPQ)' : 'Non-Preemptive Priority Queue (NPPQ)'}
                       </div>
                     </div>
@@ -785,18 +783,10 @@ export default function PriorityQueuing() {
                       )}
                     </motion.button>
                   </div>
-                  <div className={`p-4 rounded-xl border-2 ${
-                    preemptionEnabled 
-                      ? 'border-green-200 bg-green-50' 
-                      : 'border-blue-200 bg-blue-50'
-                  }`}>
+                  <div className="p-4 rounded-xl border" style={{ borderColor: UI_COLORS.border, background: `${UI_COLORS.secondary}08` }}>
                     <div className="flex items-start gap-3">
-                      <Info className={`w-5 h-5 mt-0.5 ${
-                        preemptionEnabled ? 'text-green-600' : 'text-blue-600'
-                      }`} />
-                      <div className={`text-sm ${
-                        preemptionEnabled ? 'text-green-700' : 'text-blue-700'
-                      }`}>
+                      <Info className="w-5 h-5 mt-0.5" style={{ color: UI_COLORS.primary }} />
+                      <div className="text-sm" style={{ color: UI_COLORS.textMuted }}>
                         {preemptionEnabled ? (
                           <>
                             <div className="font-semibold mb-2">Preemptive Mode (PPQ):</div>
@@ -823,8 +813,8 @@ export default function PriorityQueuing() {
                   </div>
                 </div>
                 {/* Scenario Presets */}
-                <div className="p-6 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border-2 border-blue-200">
-                  <h3 className="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
+                <div className="p-6 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
                     <AlertTriangle className="w-5 h-5" />
                     Emergency Scenarios
                   </h3>
@@ -837,12 +827,13 @@ export default function PriorityQueuing() {
                         onClick={() => applyScenario(key)}
                         className={`p-3 rounded-xl border-2 text-left transition-all ${
                           selectedScenario === key
-                            ? 'border-blue-500 bg-blue-100 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
+                            ? 'border-blue-500 shadow-sm'
+                              : 'border-gray-200 hover:shadow-sm'
                         }`}
+                          style={{ background: selectedScenario === key ? `${UI_COLORS.secondary}12` : UI_COLORS.white }}
                       >
-                        <div className="font-semibold text-gray-800 text-sm mb-1">{scenario.name}</div>
-                        <div className="text-xs text-gray-600 mb-2">{scenario.description}</div>
+                          <div className="font-semibold text-sm mb-1" style={{ color: UI_COLORS.textDark }}>{scenario.name}</div>
+                          <div className="text-xs mb-2" style={{ color: UI_COLORS.textMuted }}>{scenario.description}</div>
                         <div className="flex gap-1">
                           {Object.entries(scenario.distribution).map(([level, percentage]) => (
                             <div
@@ -861,14 +852,14 @@ export default function PriorityQueuing() {
                 </div>
               </div>
               {/* Mathematical Formulation */}
-              <div className="p-6 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border-2 border-gray-200 mb-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  📐 Mathematical Formulation
+              <div className="p-6 rounded-xl border mb-6" style={{ background: `${UI_COLORS.secondary}08`, borderColor: UI_COLORS.border }}>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                  Mathematical Formulation
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                   <div>
-                    <div className="font-semibold text-gray-700 mb-2">System Parameters:</div>
-                    <ul className="space-y-1 text-gray-600">
+                    <div className="font-semibold mb-2" style={{ color: UI_COLORS.textDark }}>System Parameters:</div>
+                    <ul className="space-y-1" style={{ color: UI_COLORS.textMuted }}>
                       <li>• <strong>λᵢ</strong>: Arrival rate for priority class i</li>
                       <li>• <strong>μᵢ</strong>: Service rate for priority class i</li>
                       <li>• <strong>c</strong>: Number of servers (physicians)</li>
@@ -876,8 +867,8 @@ export default function PriorityQueuing() {
                     </ul>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-700 mb-2">Performance Metrics:</div>
-                    <ul className="space-y-1 text-gray-600">
+                    <div className="font-semibold mb-2" style={{ color: UI_COLORS.textDark }}>Performance Metrics:</div>
+                    <ul className="space-y-1" style={{ color: UI_COLORS.textMuted }}>
                       <li>• <strong>Wᵢ</strong>: Expected waiting time for class i</li>
                       <li>• <strong>Lᵢ</strong>: Expected queue length for class i</li>
                       <li>• <strong>Pᵢ</strong>: Probability of interruption (if preemptive)</li>
@@ -906,9 +897,9 @@ export default function PriorityQueuing() {
                     className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
                       isValidDistribution
                         ? 'text-white shadow-lg hover:shadow-xl'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
-                      style={isValidDistribution ? { background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` } : {}}
+                          style={isValidDistribution ? { background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` } : {}}
                   >
                     <div className="flex items-center gap-3">
                       <Settings className="w-6 h-6" />
@@ -1073,8 +1064,8 @@ export default function PriorityQueuing() {
                   <div className="text-center">
                     <div className="text-sm text-gray-600 mb-2">Simulation Status</div>
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-green-700 font-semibold">
+                        <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: UI_COLORS.primary }} />
+                      <span className="font-semibold" style={{ color: UI_COLORS.textDark }}>
                         {preemptionEnabled ? 'Preemptive' : 'Non-preemptive'} priority system active - 
                         Processing {triageDistribution.level1 + triageDistribution.level2}% high-priority cases
                         {preemptionEnabled ? ' with interruption capability' : ' in order'}
