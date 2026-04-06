@@ -128,7 +128,7 @@ function ResultHospitalNode({ data }) {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium" style={{ color: COLORS.textMuted }}>Utilization (ρ)</span>
               <span className="text-xs font-bold" style={{ color: heatColor }}>
-                {utilizationPercent.toFixed(0)}%
+                {(utilizationPercent).toFixed(2)}%
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -498,25 +498,25 @@ export default function JacksonResult() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
                     <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-                    {currentTimePoint.system_metrics?.avg_utilization || 0}%
+                    {(currentTimePoint.system_metrics?.avg_utilization || 0).toFixed(2)}%
                   </p>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
                     <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
-                    {currentTimePoint.system_metrics?.peak_utilization || 0}%
+                    {(currentTimePoint.system_metrics?.peak_utilization || 0).toFixed(2)}%
                   </p>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Peak Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
                     <p className="text-2xl font-bold" style={{ color: COLORS.success }}>
-                    {currentTimePoint.system_metrics?.total_throughput || 0}
+                    {(currentTimePoint.system_metrics?.total_throughput || 0).toFixed(2)}
                   </p>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Throughput/hr</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
                     <p className="text-2xl font-bold" style={{ color: COLORS.secondary }}>
-                    {currentTimePoint.system_metrics?.total_queue_length || 0}
+                    {(currentTimePoint.system_metrics?.total_queue_length || 0).toFixed(2)}
                   </p>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Total Queue</p>
                 </div>
@@ -725,13 +725,13 @@ export default function JacksonResult() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-4 rounded-xl bg-gray-50">
                   <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-                    {jacksonResults.simulation_summary.final_avg_utilization}%
+                    {(jacksonResults.simulation_summary.final_avg_utilization || 0).toFixed(2)}%
                   </p>
                   <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-50">
                   <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
-                    {jacksonResults.simulation_summary.final_peak_utilization}%
+                    {(jacksonResults.simulation_summary.final_peak_utilization || 0).toFixed(2)}%
                   </p>
                   <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Peak Utilization</p>
                 </div>

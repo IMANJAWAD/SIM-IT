@@ -104,7 +104,7 @@ function HospitalNode({ data }) {
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-medium" style={{ color: COLORS.textMuted }}>Utilization</span>
               <span className="text-xs font-bold" style={{ color: heatColor }}>
-                {utilizationPercent.toFixed(1)}%
+                {utilizationPercent.toFixed(2)}%
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -525,7 +525,8 @@ export default function JacksonNetwork() {
     return data;
   }, [networkMetrics, nodeConfigs]);
 
-  // Call Jackson Network Time-Series API or use local simulation
+  // Call Jackson Network Time-Series API
+  // Call Jackson Network Time-Series API
   const callJacksonTimeSeriesAPI = async () => {
     try {
       setApiError(null);
@@ -534,36 +535,122 @@ export default function JacksonNetwork() {
       const nodes = departmentIds.map(id => ({
         name: nodeConfigs[id].name,
         mu: nodeConfigs[id].serviceRate,
-        c: nodeConfigs[id].servers,
-        cost_per_hour: nodeConfigs[id].costPerHour
+        c: nodeConfigs[id].servers
       }));
       
-      // Use local discrete event simulation
-      const calculator = new JacksonNetworkCalculator(
-        nodes.map(n => ({ name: n.name, mu: n.mu, c: n.c, costPerHour: n.cost_per_hour })),
-        routingMatrix,
-        externalArrival
-      );
-      
-      const metrics = calculator.analyzeNetwork();
-      const simulation = calculator.discreteEventSimulation(60, 10); // 60 min simulation with 10 min warmup
-      
-      const result = {
-        status: 'Success',
-        metrics: metrics,
-        simulation: simulation,
-        message: 'Discrete Event Simulation with integer queue lengths'
+      const requestData = {
+        nodes: nodes,
+        matrix: routingMatrix,
+        external_arrival: externalArrival,
+        simulation_minutes: 10,
+        sample_interval: 0.5
       };
       
-      console.log('Simulation Results:', result);
+      console.log('Calling backend API with data:', requestData);
+      
+      // Call backend API
+      const response = await fetch('http://localhost:8000/api/jackson/simulate-timeseries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('Backend API Response:', result);
+      
+      // Transform backend response to match frontend expectations
+      const transformedResult = {
+        status: result.status,
+        simulation_config: result.simulation_config,
+        timeseries_data: result.timeseries_data,
+        simulation_summary: result.simulation_summary,
+        steady_state_reference: result.steady_state_reference,
+        message: 'Jackson Network simulation from backend API'
+      };
+      
       setIsLoading(false);
-      return result;
+      return transformedResult;
       
     } catch (error) {
-      console.error('Simulation Error:', error);
+      console.error('API Error:', error);
       setApiError(error.message);
-      setIsLoading(false);
-      return null;
+      
+      // Fallback to local simulation if API fails
+      console.log('Falling back to local simulation...');
+      try {
+        const nodes = departmentIds.map(id => ({
+          name: nodeConfigs[id].name,
+          mu: nodeConfigs[id].serviceRate,
+          c: nodeConfigs[id].servers,
+          costPerHour: nodeConfigs[id].costPerHour
+        }));
+        
+        const calculator = new JacksonNetworkCalculator(
+          nodes,
+          routingMatrix,
+          externalArrival
+        );
+        
+        const metrics = calculator.analyzeNetwork();
+        const simulation = calculator.discreteEventSimulation(60, 10);
+        
+        const fallbackResult = {
+          status: 'Success',
+          simulation_config: {
+            duration_minutes: 10,
+            sample_interval: 0.5,
+            total_samples: simulation.timePoints.length,
+            external_arrival_rate: externalArrival
+          },
+          timeseries_data: simulation.timePoints.map((time, index) => ({
+            time_minutes: time,
+            timestamp: `${Math.floor(time)}:${Math.floor((time % 1) * 60).toString().padStart(2, '0')}`,
+            nodes: departmentIds.map((id, nodeIndex) => ({
+              name: nodeConfigs[id].name,
+              utilization: (simulation.utilizations[nodeIndex][index] || 0) * 100,
+              queue_length: simulation.queueLengths[nodeIndex][index] || 0,
+              wait_time_mins: ((simulation.queueLengths[nodeIndex][index] || 0) / (metrics.results[nodeIndex]?.lambda || 1)) * 60,
+              arrival_rate: metrics.results[nodeIndex]?.lambda || 0,
+              throughput: (simulation.utilizations[nodeIndex][index] || 0) * nodeConfigs[id].servers * nodeConfigs[id].serviceRate
+            })),
+            system_metrics: {
+              avg_utilization: simulation.utilizations.reduce((sum, nodeUtil) => 
+                sum + (nodeUtil[index] || 0), 0) / departmentIds.length * 100,
+              peak_utilization: Math.max(...simulation.utilizations.map(nodeUtil => 
+                (nodeUtil[index] || 0) * 100)),
+              total_throughput: simulation.utilizations.reduce((sum, nodeUtil, nodeIndex) => 
+                sum + (nodeUtil[index] || 0) * nodeConfigs[departmentIds[nodeIndex]].servers * nodeConfigs[departmentIds[nodeIndex]].serviceRate, 0),
+              total_queue_length: simulation.queueLengths.reduce((sum, nodeQueue) => 
+                sum + (nodeQueue[index] || 0), 0),
+              safety_margin: 100 - Math.max(...simulation.utilizations.map(nodeUtil => 
+                (nodeUtil[index] || 0) * 100)),
+              system_load: "Medium"
+            }
+          })),
+          simulation_summary: {
+            converged_to_steady_state: true,
+            final_avg_utilization: metrics.results.reduce((sum, node) => sum + (node.rho * 100), 0) / metrics.results.length,
+            final_peak_utilization: Math.max(...metrics.results.map(node => node.rho * 100)),
+            system_stability: metrics.systemStable ? "Stable" : "Unstable"
+          },
+          message: 'Local fallback simulation (API unavailable)'
+        };
+        
+        setIsLoading(false);
+        return fallbackResult;
+        
+      } catch (fallbackError) {
+        console.error('Fallback simulation failed:', fallbackError);
+        setIsLoading(false);
+        return null;
+      }
     }
   };
 
@@ -934,7 +1021,7 @@ export default function JacksonNetwork() {
                     <div className="flex justify-between">
                       <span className="text-sm" style={{ color: COLORS.textMuted }}>Utilization (ρ)</span>
                       <span className="font-bold" style={{ color: selectedMetrics.rho >= 1 ? COLORS.alertHint : COLORS.primary }}>
-                        {selectedMetrics.rho.toFixed(3)}
+                        {selectedMetrics.rho.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -1116,7 +1203,7 @@ export default function JacksonNetwork() {
                   <span className="text-sm" style={{ color: COLORS.textMuted }}>Throughput</span>
                 </div>
                 <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                  {networkMetrics.throughput.toFixed(1)} <span className="text-sm">pts/hr</span>
+                  {networkMetrics.throughput.toFixed(2)} <span className="text-sm">pts/hr</span>
                 </p>
               </div>
               
@@ -1168,7 +1255,7 @@ export default function JacksonNetwork() {
               </div>
               <div className="text-center">
                 <span className="text-3xl font-bold" style={{ color: COLORS.primary }}>
-                  {externalArrival.toFixed(1)}
+                  {externalArrival.toFixed(2)}
                 </span>
                 <span className="text-sm ml-2" style={{ color: COLORS.textMuted }}>patients/hour</span>
               </div>

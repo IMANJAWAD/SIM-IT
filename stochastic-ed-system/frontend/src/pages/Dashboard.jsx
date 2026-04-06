@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Activity, Zap, RefreshCw, Clock, Users, Gauge, AlertTriangle,
   TrendingUp, BarChart3, GitBranch, ArrowRight, Sliders, RotateCcw,
-  Stethoscope, Shield, ChevronRight
+  Stethoscope, Shield, ChevronRight, PieChart, Settings, Target
 } from 'lucide-react';
 
 import MarkovVisualization from '../components/MarkovVisualization';
@@ -44,6 +44,39 @@ const SLIDERS = [
   { key: 'num_replications', label: 'Replications', min: 50, max: 1000, step: 50, unit: '' },
 ];
 
+const RESULT_TABS = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    icon: Activity,
+    description: 'Key metrics and performance indicators'
+  },
+  {
+    id: 'markov',
+    label: 'Markov Analysis',
+    icon: GitBranch,
+    description: 'State transitions and steady-state probabilities'
+  },
+  {
+    id: 'distributions',
+    label: 'Distributions',
+    icon: BarChart3,
+    description: 'Length of stay and queue dynamics'
+  },
+  {
+    id: 'resources',
+    label: 'Resources',
+    icon: Users,
+    description: 'Staff and equipment utilization'
+  },
+  {
+    id: 'comparison',
+    label: 'Comparison',
+    icon: Target,
+    description: 'Theoretical vs simulation results'
+  }
+];
+
 const EKGLoader = () => (
   <div className="flex items-center gap-3">
     <svg width="60" height="20" viewBox="0 0 60 20" className="overflow-visible">
@@ -75,6 +108,7 @@ const Dashboard = () => {
   const [sensitivityData, setSensitivityData] = useState(null);
   const [error, setError] = useState(null);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   const showResults = simulationData && !isLoading;
 
@@ -305,94 +339,171 @@ const Dashboard = () => {
                 </div>
               </header>
 
-              <section className="mb-8" aria-label="Key Performance Indicators">
-                <header className="mb-6">
-                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Key Performance Indicators</h2>
-                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Core metrics from the simulation</p>
-                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
-                </header>
-                <ul className="grid grid-cols-2 lg:grid-cols-5 gap-4" style={{ listStyle: 'none' }}>
-                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Wait Time</p>
-                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_waiting_time?.toFixed(2) || '—'}</p>
-                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
-                  </li>
-                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Length of Stay</p>
-                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_los?.toFixed(2) || '—'}</p>
-                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
-                  </li>
-                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Throughput</p>
-                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.throughput?.toFixed(2) || '—'}</p>
-                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>patients/hour</p>
-                  </li>
-                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Doctor Utilization</p>
-                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.resource_utilization?.doctors?.toFixed(2) || '—'}</p>
-                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>percentage</p>
-                  </li>
-                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Overload Probability</p>
-                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.steady_state_overload_probability?.toFixed(2) || '—'}</p>
-                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>steady-state</p>
-                  </li>
-                </ul>
-              </section>
+              {/* Tabbed Results Interface */}
+              <section className="mb-8" aria-label="Simulation Results">
+                <div className="bg-white rounded-2xl shadow-sm border" style={{ borderColor: COLORS.border }}>
+                  
+                  {/* Tab Navigation */}
+                  <nav className="border-b" style={{ borderColor: COLORS.border }} aria-label="Results Navigation">
+                    <div className="flex overflow-x-auto">
+                      {RESULT_TABS.map((tab) => {
+                        const IconComponent = tab.icon;
+                        return (
+                          <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+                              activeTab === tab.id
+                                ? 'border-current'
+                                : 'border-transparent hover:border-gray-300'
+                            }`}
+                            style={{
+                              color: activeTab === tab.id ? COLORS.primary : COLORS.textMuted,
+                              borderBottomColor: activeTab === tab.id ? COLORS.primary : 'transparent'
+                            }}
+                            aria-selected={activeTab === tab.id}
+                          >
+                            <IconComponent className="w-4 h-4" />
+                            {tab.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </nav>
 
-              <section className="mb-8" aria-label="Markov Chain Analysis">
-                <header className="mb-6">
-                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Markov Chain Analysis</h2>
-                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>State transitions and steady-state probabilities</p>
-                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
-                </header>
-                <article className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                  <MarkovVisualization data={markovData} />
-                </article>
-              </section>
+                  {/* Tab Content */}
+                  <div className="p-6">
+                    <AnimatePresence mode="wait">
+                      
+                      {/* Overview Tab */}
+                      {activeTab === 'overview' && (
+                        <motion.div
+                          key="overview"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <header className="mb-6">
+                            <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Key Performance Indicators</h3>
+                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Core metrics from the simulation</p>
+                          </header>
+                          <ul className="grid grid-cols-2 lg:grid-cols-5 gap-4" style={{ listStyle: 'none' }}>
+                            <li className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Wait Time</p>
+                              <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_waiting_time?.toFixed(2) || '—'}</p>
+                              <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
+                            </li>
+                            <li className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Length of Stay</p>
+                              <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_los?.toFixed(2) || '—'}</p>
+                              <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
+                            </li>
+                            <li className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Throughput</p>
+                              <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.throughput?.toFixed(2) || '—'}</p>
+                              <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>patients/hour</p>
+                            </li>
+                            <li className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Doctor Utilization</p>
+                              <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.resource_utilization?.doctors?.toFixed(2) || '—'}</p>
+                              <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>percentage</p>
+                            </li>
+                            <li className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Overload Probability</p>
+                              <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.steady_state_overload_probability?.toFixed(2) || '—'}</p>
+                              <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>steady-state</p>
+                            </li>
+                          </ul>
+                        </motion.div>
+                      )}
 
-              <section className="mb-8" aria-label="Distribution Analysis">
-                <header className="mb-6">
-                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Distribution Analysis</h2>
-                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Length of stay and queue dynamics</p>
-                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
-                </header>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <figure className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Length of Stay Distribution</figcaption>
-                    <LOSDistributionChart data={simulationData?.distributions?.los_values} />
-                  </figure>
-                  <figure className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                    <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Queue Length Over Time</figcaption>
-                    <QueueLengthChart data={simulationData?.distributions?.queue_length_over_time} />
-                  </figure>
+                      {/* Markov Analysis Tab */}
+                      {activeTab === 'markov' && (
+                        <motion.div
+                          key="markov"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <header className="mb-6">
+                            <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Markov Chain Analysis</h3>
+                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>State transitions and steady-state probabilities</p>
+                          </header>
+                          <MarkovVisualization data={markovData} />
+                        </motion.div>
+                      )}
+
+                      {/* Distributions Tab */}
+                      {activeTab === 'distributions' && (
+                        <motion.div
+                          key="distributions"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <header className="mb-6">
+                            <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Distribution Analysis</h3>
+                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Length of stay and queue dynamics</p>
+                          </header>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <figure className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Length of Stay Distribution</figcaption>
+                              <LOSDistributionChart data={simulationData?.distributions?.los_values} />
+                            </figure>
+                            <figure className="bg-gray-50 rounded-xl p-5 border" style={{ borderColor: COLORS.border }}>
+                              <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Queue Length Over Time</figcaption>
+                              <QueueLengthChart data={simulationData?.distributions?.queue_length_over_time} />
+                            </figure>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Resources Tab */}
+                      {activeTab === 'resources' && (
+                        <motion.div
+                          key="resources"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <header className="mb-6">
+                            <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Resource Utilization</h3>
+                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Staff and equipment usage patterns</p>
+                          </header>
+                          <figure className="bg-gray-50 rounded-xl p-6 border" style={{ borderColor: COLORS.border }}>
+                            <ResourceUtilizationChart data={simulationData?.metrics?.resource_utilization} />
+                          </figure>
+                        </motion.div>
+                      )}
+
+                      {/* Comparison Tab */}
+                      {activeTab === 'comparison' && (
+                        <motion.div
+                          key="comparison"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <header className="mb-6">
+                            <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Theoretical Comparison</h3>
+                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Simulated vs theoretical values</p>
+                          </header>
+                          <ComparisonSection
+                            theoreticalData={markovData?.theoretical_mmc}
+                            simulatedData={simulationData?.metrics}
+                            longTermData={longTermData}
+                          />
+                        </motion.div>
+                      )}
+
+                    </AnimatePresence>
+                  </div>
                 </div>
-              </section>
-
-              <section className="mb-8" aria-label="Resource Utilization">
-                <header className="mb-6">
-                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Resource Utilization</h2>
-                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Staff and equipment usage patterns</p>
-                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
-                </header>
-                <figure className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                  <ResourceUtilizationChart data={simulationData?.metrics?.resource_utilization} />
-                </figure>
-              </section>
-
-              <section className="mb-8" aria-label="Theoretical Comparison">
-                <header className="mb-6">
-                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Theoretical Comparison</h2>
-                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Simulated vs theoretical values</p>
-                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
-                </header>
-                <article className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
-                  <ComparisonSection
-                    theoreticalData={markovData?.theoretical_mmc}
-                    simulatedData={simulationData?.metrics}
-                    longTermData={longTermData}
-                  />
-                </article>
               </section>
 
               {sensitivityData && (

@@ -43,20 +43,39 @@ async def simulate_nhpp(data: NHPPRequest):
             # For NHPP, we analyze instantaneous rates, not steady-state
             rho = lam / capacity if capacity > 0 else 0
             
-            # NHPP Wait Time: For time-varying systems, use Little's Law approximation
-            # W ≈ L/λ where L is expected queue length at time t
-            if rho < 0.95:  # System can handle the load
-                # For M(t)/M/c: approximate expected queue length
-                expected_queue = max(0, lam - capacity) if lam > capacity else 0
-                wait_time = (expected_queue / lam) * 60 if lam > 0 else 0  # Convert to minutes
+            # Proper M/M/c queueing formulas for wait time
+            if rho < 1.0:  # System is stable
+                # For M/M/c queue: Expected wait time in queue (Wq)
+                # First calculate P0 (probability of empty system)
+                if data.num_staff == 1:
+                    # M/M/1 case
+                    wq = (rho / (1 - rho)) / data.mu if rho > 0 else 0
+                else:
+                    # M/M/c case - simplified approximation
+                    # Wq ≈ (ρ^c / (c! * (1-ρ)^2)) * (1/μ) for ρ < 1
+                    if rho > 0:
+                        rho_c = rho ** data.num_staff
+                        factorial_c = math.factorial(data.num_staff)
+                        wq = (rho_c / (factorial_c * (1 - rho) ** 2)) * (1 / data.mu)
+                    else:
+                        wq = 0
+                
+                wait_time_hours = wq
+                wait_time_minutes = wq * 60
+                
+                # Expected queue length using Little's Law: Lq = λ * Wq
+                expected_queue = lam * wq
             else:
-                # High utilization: use approximation for overloaded system
-                wait_time = (rho / (1.05 - rho)) * (60 / data.mu) if rho < 1 else 60
+                # System is unstable (ρ ≥ 1)
+                wait_time_minutes = min(240, (rho / (1.01 - min(rho, 0.99))) * 60)  # Cap at 4 hours
+                expected_queue = lam * (wait_time_minutes / 60)
             
             hourly_results.append({
                 "hour": hour,
                 "utilization": round(rho * 100, 2),
-                "theoretical_wait": round(min(wait_time, 120), 2)  # Cap at 2 hours for realism
+                "theoretical_wait": round(min(wait_time_minutes, 240), 2),  # Cap at 4 hours
+                "queue_length": round(expected_queue, 2),
+                "predicted_arrivals": lam
             })
         
         # 2. Peak Impact Analytics

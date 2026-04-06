@@ -898,23 +898,7 @@ export default function PriorityQueuing() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <div className="text-center">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={updateSystemModel}
-                    disabled={!isValidDistribution}
-                    className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
-                      isValidDistribution
-                        ? 'text-white shadow-lg hover:shadow-xl'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                      style={isValidDistribution ? { background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` } : {}}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Settings className="w-6 h-6" />
-                      Update System Model
-                    </div>
-                  </motion.button>
+                  
 
                   <motion.button
                     whileHover={{ scale: 1.05 }}

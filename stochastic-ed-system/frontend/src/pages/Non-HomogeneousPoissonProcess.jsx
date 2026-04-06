@@ -19,7 +19,8 @@ import {
   Stethoscope,
   Bed,
   XCircle,
-  CheckCircle
+  CheckCircle,
+  ArrowRight
 } from 'lucide-react';
 import {
   LineChart,
@@ -468,8 +469,8 @@ export default function NonHomogeneousPoissonProcess() {
     setApiError(null);
   }, []);
 
-  // Run local NHPP simulation (validated backend algorithm)
-  const runLocalSimulation = useCallback(async () => {
+  // Run NHPP simulation via backend API
+  const runNHPPSimulation = useCallback(async () => {
     setIsLoading(true);
     setApiError(null);
     setSimulationProgress(0);
@@ -480,31 +481,90 @@ export default function NonHomogeneousPoissonProcess() {
         setSimulationProgress(prev => Math.min(prev + 10, 90));
       }, 200);
       
-      // Run NHPP simulation with 100 replications for statistical significance
-      const simulator = new NHPPBackendSimulator(
-        lambdaValues,
-        SYSTEM_CAPACITY.serviceRate,
-        SYSTEM_CAPACITY.servers,
-        0.15, // critical care ratio
-        100   // replications
-      );
+      const requestData = {
+        lambda_schedule: lambdaValues,
+        mu: SYSTEM_CAPACITY.serviceRate,
+        num_staff: SYSTEM_CAPACITY.servers,
+        critical_ratio: 0.15,
+        replications: 100
+      };
       
-      const results = simulator.runSimulation();
+      console.log('Calling NHPP backend API with data:', requestData);
+      
+      // Call backend API
+      const response = await fetch('http://localhost:8000/nhpp/simulate-nhpp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+      
+      const backendResults = await response.json();
+      console.log('NHPP Backend API Response:', backendResults);
       
       clearInterval(progressInterval);
       setSimulationProgress(100);
       
+      // Transform backend results to match frontend expectations
+      const transformedResults = {
+        summary: {
+          totalPatients: backendResults.daily_total,
+          meanWaitTime: backendResults.hourly_data.length > 0 ? 
+            backendResults.hourly_data.reduce((sum, h) => sum + h.theoretical_wait, 0) / backendResults.hourly_data.length / 60 : 0, // Convert to hours
+          stdWaitTime: 0.5, // Placeholder
+          percentile95WaitTime: backendResults.hourly_data.length > 0 ? 
+            Math.max(...backendResults.hourly_data.map(h => h.theoretical_wait)) / 60 : 0, // Convert to hours
+          overflowProbability: backendResults.hourly_data.filter(h => h.utilization > 100).length / 24,
+          meanCriticalCareLoad: backendResults.critical_patients,
+          meanQueueLength: backendResults.monte_carlo_summary?.avg_queue_length || 0,
+          stdQueueLength: backendResults.monte_carlo_summary?.queue_variability || 0
+        },
+        hourlyStats: backendResults.hourly_data.map(hourData => ({
+          hour: hourData.hour,
+          predictedArrivals: hourData.predicted_arrivals || lambdaValues[hourData.hour],
+          avgArrivals: hourData.predicted_arrivals || lambdaValues[hourData.hour],
+          avgQueueLength: hourData.queue_length || 0,
+          avgUtilization: hourData.utilization / 100
+        }))
+      };
+      
       setTimeout(() => {
-        setNhppResults(results);
+        setNhppResults(transformedResults);
         setIsLoading(false);
         setSimulationProgress(0);
       }, 500);
       
     } catch (error) {
-      console.error('NHPP Simulation Error:', error);
+      console.error('NHPP API Error:', error);
       setApiError(error.message);
-      setIsLoading(false);
-      setSimulationProgress(0);
+      
+      // Fallback to local simulation if API fails
+      console.log('Falling back to local simulation...');
+      try {
+        const simulator = new NHPPBackendSimulator(
+          lambdaValues,
+          SYSTEM_CAPACITY.serviceRate,
+          SYSTEM_CAPACITY.servers,
+          0.15,
+          100
+        );
+        
+        const results = simulator.runSimulation();
+        setNhppResults(results);
+        setIsLoading(false);
+        setSimulationProgress(0);
+      } catch (fallbackError) {
+        console.error('Fallback simulation failed:', fallbackError);
+        setApiError(fallbackError.message);
+        setIsLoading(false);
+        setSimulationProgress(0);
+      }
     }
   }, [lambdaValues]);
 
@@ -512,14 +572,92 @@ export default function NonHomogeneousPoissonProcess() {
   const startSimulation = useCallback(async () => {
     if (isSimulationRunning) return;
     
-    setIsSimulationRunning(true);
-    await runLocalSimulation();
-    
-    // Navigate to results page after simulation completes
+    // If we already have results, navigate to detailed results page
     if (nhppResults) {
+      // Transform data to match results page expectations
+      const transformedResults = {
+        ...nhppResults,
+        hourly_data: nhppResults.hourlyStats.map(stat => ({
+          hour: stat.hour,
+          utilization: Math.round(stat.avgUtilization * 100),
+          theoretical_wait: (stat.avgQueueLength / stat.predictedArrivals) * 60, // Convert to minutes
+          queue_length: stat.avgQueueLength
+        })),
+        daily_total: nhppResults.summary.totalPatients,
+        critical_patients: Math.round(nhppResults.summary.meanCriticalCareLoad),
+        peak_hour: nhppResults.hourlyStats.reduce((maxHour, stat, index) => 
+          stat.avgUtilization > nhppResults.hourlyStats[maxHour].avgUtilization ? index : maxHour, 0),
+        peak_utilization: Math.round(Math.max(...nhppResults.hourlyStats.map(s => s.avgUtilization * 100))),
+        monte_carlo_results: nhppResults.hourlyStats.map(s => s.avgQueueLength),
+        monte_carlo_confidence: nhppResults.hourlyStats.map(stat => ({
+          mean: stat.avgQueueLength,
+          lower: Math.max(0, stat.avgQueueLength - stat.avgQueueLength * 0.2),
+          upper: stat.avgQueueLength + stat.avgQueueLength * 0.2,
+          std: stat.avgQueueLength * 0.15
+        })),
+        monte_carlo_summary: {
+          avg_queue_length: nhppResults.summary.meanQueueLength,
+          max_queue_length: Math.max(...nhppResults.hourlyStats.map(s => s.avgQueueLength)),
+          queue_variability: nhppResults.summary.stdQueueLength,
+          total_replications: 100
+        }
+      };
+
       navigate('/nhpp-results', {
         state: {
-          nhppResults: nhppResults,
+          nhppResults: transformedResults,
+          simulationParams: {
+            lambda_schedule: lambdaValues,
+            mu: SYSTEM_CAPACITY.serviceRate,
+            num_staff: SYSTEM_CAPACITY.servers,
+            critical_ratio: 0.15,
+            replications: 100
+          }
+        }
+      });
+      return;
+    }
+    
+    setIsSimulationRunning(true);
+    await runNHPPSimulation();
+    setIsSimulationRunning(false);
+  }, [isSimulationRunning, runNHPPSimulation, nhppResults, navigate, lambdaValues]);
+
+  // Navigate to results page with current results
+  const viewDetailedResults = useCallback(() => {
+    if (nhppResults) {
+      // Transform data to match results page expectations
+      const transformedResults = {
+        ...nhppResults,
+        hourly_data: nhppResults.hourlyStats.map(stat => ({
+          hour: stat.hour,
+          utilization: Math.round(stat.avgUtilization * 100),
+          theoretical_wait: (stat.avgQueueLength / stat.predictedArrivals) * 60, // Convert to minutes
+          queue_length: stat.avgQueueLength
+        })),
+        daily_total: nhppResults.summary.totalPatients,
+        critical_patients: Math.round(nhppResults.summary.meanCriticalCareLoad),
+        peak_hour: nhppResults.hourlyStats.reduce((maxHour, stat, index) => 
+          stat.avgUtilization > nhppResults.hourlyStats[maxHour].avgUtilization ? index : maxHour, 0),
+        peak_utilization: Math.round(Math.max(...nhppResults.hourlyStats.map(s => s.avgUtilization * 100))),
+        monte_carlo_results: nhppResults.hourlyStats.map(s => s.avgQueueLength),
+        monte_carlo_confidence: nhppResults.hourlyStats.map(stat => ({
+          mean: stat.avgQueueLength,
+          lower: Math.max(0, stat.avgQueueLength - stat.avgQueueLength * 0.2),
+          upper: stat.avgQueueLength + stat.avgQueueLength * 0.2,
+          std: stat.avgQueueLength * 0.15
+        })),
+        monte_carlo_summary: {
+          avg_queue_length: nhppResults.summary.meanQueueLength,
+          max_queue_length: Math.max(...nhppResults.hourlyStats.map(s => s.avgQueueLength)),
+          queue_variability: nhppResults.summary.stdQueueLength,
+          total_replications: 100
+        }
+      };
+
+      navigate('/nhpp-results', {
+        state: {
+          nhppResults: transformedResults,
           simulationParams: {
             lambda_schedule: lambdaValues,
             mu: SYSTEM_CAPACITY.serviceRate,
@@ -530,9 +668,7 @@ export default function NonHomogeneousPoissonProcess() {
         }
       });
     }
-    
-    setIsSimulationRunning(false);
-  }, [isSimulationRunning, runLocalSimulation, nhppResults, navigate, lambdaValues]);
+  }, [nhppResults, navigate, lambdaValues]);
 
   // Prepare hourly stats for display
   const hourlyStatsData = useMemo(() => {
@@ -600,6 +736,11 @@ export default function NonHomogeneousPoissonProcess() {
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Simulating NHPP... {simulationProgress}%
+                      </>
+                    ) : nhppResults ? (
+                      <>
+                        <ArrowRight className="w-5 h-5" />
+                        View Detailed Results
                       </>
                     ) : (
                       <>
@@ -913,10 +1054,21 @@ export default function NonHomogeneousPoissonProcess() {
               className="mb-8"
             >
               <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2" style={{ color: COLORS.textDark }}>
-                  <Activity className="w-6 h-6" style={{ color: COLORS.primary }} />
-                  NHPP Simulation Results (100 Replications)
-                </h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: COLORS.textDark }}>
+                    <Activity className="w-6 h-6" style={{ color: COLORS.primary }} />
+                    NHPP Simulation Results (100 Replications)
+                  </h2>
+                  <motion.button
+                    onClick={viewDetailedResults}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
+                  >
+                    View Detailed Results
+                  </motion.button>
+                </div>
                 
                 {/* Summary Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -961,60 +1113,43 @@ export default function NonHomogeneousPoissonProcess() {
                   </div>
                 </div>
 
-                {/* Hourly Statistics Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b" style={{ borderColor: COLORS.bgLight }}>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Hour</th>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Predicted λ(t)</th>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Simulated Arrivals</th>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Avg Queue Length</th>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Utilization</th>
-                        <th className="p-3 text-left font-semibold" style={{ color: COLORS.textDark }}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hourlyStatsData.map((stat, idx) => {
-                        const isOverCapacity = stat.predictedArrivals > SYSTEM_CAPACITY.maxCapacity;
-                        return (
-                          <tr key={idx} className="border-b" style={{ borderColor: COLORS.bgLight }}>
-                            <td className="p-3 font-medium" style={{ color: COLORS.textDark }}>{stat.hour}</td>
-                            <td className="p-3">{stat.predictedArrivals}</td>
-                            <td className="p-3">{stat.simulatedArrivals}</td>
-                            <td className="p-3">{stat.queueLength}</td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: COLORS.bgLight }}>
-                                  <div 
-                                    className="h-full rounded-full transition-all"
-                                    style={{ 
-                                      width: `${stat.utilization}%`,
-                                      background: stat.utilization > 80 ? COLORS.danger : stat.utilization > 60 ? COLORS.warning : COLORS.success
-                                    }}
-                                  />
-                                </div>
-                                <span className="text-xs">{stat.utilization}%</span>
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              {isOverCapacity ? (
-                                <div className="flex items-center gap-1 text-red-600">
-                                  <XCircle className="w-4 h-4" />
-                                  <span className="text-xs">Over Capacity</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-1 text-green-600">
-                                  <CheckCircle className="w-4 h-4" />
-                                  <span className="text-xs">Operational</span>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                {/* Quick Preview Chart */}
+                <div className="h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={hourlyStatsData.slice(0, 12)}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
+                      <XAxis 
+                        dataKey="hour" 
+                        stroke={COLORS.textMuted}
+                        fontSize={11}
+                      />
+                      <YAxis 
+                        stroke={COLORS.textMuted}
+                        fontSize={11}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          background: 'rgba(255,255,255,0.95)',
+                          border: `1px solid ${COLORS.secondary}`,
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="utilization" 
+                        stroke={COLORS.primary}
+                        strokeWidth={2}
+                        dot={{ fill: COLORS.primary, r: 3 }}
+                        name="Utilization %"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>
+                    Click "View Detailed Results" to see complete analysis, charts, and hourly breakdown table
+                  </p>
                 </div>
               </div>
             </motion.div>

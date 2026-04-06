@@ -66,12 +66,19 @@ async def simulate_jackson(data: JacksonRequest):
             service_capacity = node.c * node.mu
             rho = arrival_rate / service_capacity
             
-            # Basic M/M/c Queueing Formulas for each node
+            # Proper M/M/c Queueing Formulas
             if rho < 1:
-                # Expected Wait Time in Queue (approx for M/M/c)
-                # For a project of 5, adding the full M/M/c formula here is a huge plus!
-                wait_time = (rho / (1 - rho)) / node.mu if rho > 0 else 0
-                queue_length = arrival_rate * wait_time
+                # Calculate P0 (probability of empty system) for M/M/c
+                sum_term = sum((arrival_rate / node.mu) ** k / math.factorial(k) for k in range(node.c))
+                last_term = ((arrival_rate / node.mu) ** node.c / math.factorial(node.c)) * (1 / (1 - rho))
+                P0 = 1 / (sum_term + last_term)
+                
+                # Expected number in queue (Lq)
+                Lq = (P0 * ((arrival_rate / node.mu) ** node.c) * rho) / (math.factorial(node.c) * ((1 - rho) ** 2))
+                
+                # Expected wait time in queue (Wq) using Little's Law
+                wait_time = Lq / arrival_rate if arrival_rate > 0 else 0
+                queue_length = Lq
                 wait_time_mins = round(wait_time * 60, 2)
                 queue_length_rounded = round(queue_length, 2)
             else:
@@ -83,8 +90,8 @@ async def simulate_jackson(data: JacksonRequest):
                 "name": node.name,
                 "arrival_rate": round(arrival_rate, 2),
                 "utilization": round(rho * 100, 2),
-                "wait_time_mins": wait_time_mins,
-                "queue_length": queue_length_rounded,
+                "wait_time_mins": wait_time_mins if wait_time_mins == "Infinite" else round(wait_time_mins, 2),
+                "queue_length": round(queue_length_rounded, 2),
                 "status": "Stable" if rho < 1 else "Unstable"
             })
         
@@ -191,9 +198,9 @@ async def simulate_jackson_timeseries(data: TimeSeriesRequest):
                 
                 node_data.append({
                     "name": node.name,
-                    "utilization": round(current_util * 100, 1),
-                    "queue_length": round(current_queue, 1),
-                    "wait_time_mins": round(wait_time, 1),
+                    "utilization": round(current_util * 100, 2),
+                    "queue_length": round(current_queue, 2),
+                    "wait_time_mins": round(wait_time, 2),
                     "arrival_rate": round(steady["arrival_rate"] * time_factor, 2),
                     "throughput": round(current_util * node.c * node.mu, 2)
                 })
@@ -209,11 +216,11 @@ async def simulate_jackson_timeseries(data: TimeSeriesRequest):
                 "timestamp": f"{int(current_time)}:{int((current_time % 1) * 60):02d}",
                 "nodes": node_data,
                 "system_metrics": {
-                    "avg_utilization": round(avg_util, 1),
-                    "peak_utilization": round(peak_util, 1),
-                    "total_throughput": round(total_throughput, 1),
-                    "total_queue_length": round(total_queue, 1),
-                    "safety_margin": round(100 - peak_util, 1),
+                    "avg_utilization": round(avg_util, 2),
+                    "peak_utilization": round(peak_util, 2),
+                    "total_throughput": round(total_throughput, 2),
+                    "total_queue_length": round(total_queue, 2),
+                    "safety_margin": round(100 - peak_util, 2),
                     "system_load": "High" if peak_util > 85 else "Medium" if peak_util > 60 else "Low"
                 }
             })
@@ -236,16 +243,16 @@ async def simulate_jackson_timeseries(data: TimeSeriesRequest):
                 "nodes": [
                     {
                         "name": steady["name"],
-                        "theoretical_utilization": round(steady["steady_utilization"] * 100, 1),
-                        "theoretical_queue": round(steady["steady_queue"], 1)
+                        "theoretical_utilization": round(steady["steady_utilization"] * 100, 2),
+                        "theoretical_queue": round(steady["steady_queue"], 2)
                     }
                     for steady in steady_state_metrics
                 ]
             },
             "simulation_summary": {
                 "converged_to_steady_state": True,
-                "final_avg_utilization": final_metrics["system_metrics"]["avg_utilization"] if final_metrics else 0,
-                "final_peak_utilization": final_metrics["system_metrics"]["peak_utilization"] if final_metrics else 0,
+                "final_avg_utilization": round(final_metrics["system_metrics"]["avg_utilization"], 2) if final_metrics else 0,
+                "final_peak_utilization": round(final_metrics["system_metrics"]["peak_utilization"], 2) if final_metrics else 0,
                 "system_stability": "Stable" if (final_metrics and final_metrics["system_metrics"]["peak_utilization"] < 95) else "Unstable"
             }
         }
