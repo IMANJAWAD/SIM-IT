@@ -20,6 +20,7 @@ import {
   Shield,
   Info
 } from 'lucide-react';
+import { showAlert, showConfirm, showSuccess, showWarning, showError } from '../components/CustomAlert';
 
 // Color palette for triage levels
 const TRIAGE_COLORS = {
@@ -247,7 +248,10 @@ export default function PriorityQueuing() {
     }
 
     if (!isValidDistribution) {
-      alert('Please ensure the distribution sums to exactly 100% before running simulation.');
+      showError('Please ensure the distribution sums to exactly 100% before running simulation.', {
+        title: 'Invalid Distribution',
+        autoClose: false
+      });
       return;
     }
 
@@ -269,7 +273,10 @@ export default function PriorityQueuing() {
       console.log(`System Check: Utilization = ${(utilization * 100).toFixed(1)}%`);
       
       if (utilization > 0.8) {
-        alert(`Warning: Utilization is ${(utilization * 100).toFixed(1)}%. For best accuracy, should be 60-70%.`);
+        showWarning(`Utilization is ${(utilization * 100).toFixed(1)}%. For best accuracy, should be 60-70%.`, {
+          title: 'High System Utilization',
+          duration: 6000
+        });
       }
       
       // Prepare API request with ACCURACY-OPTIMIZED parameters
@@ -338,7 +345,13 @@ export default function PriorityQueuing() {
       // Check for stability warnings
       if (results.validation?.stability_warnings?.length > 0) {
         const warnings = results.validation.stability_warnings.join('\n');
-        if (confirm(`System Warnings:\n${warnings}\n\nContinue to results?`)) {
+        const shouldContinue = await showConfirm(`System Warnings:\n${warnings}\n\nContinue to results?`, {
+          title: 'System Stability Warning',
+          confirmLabel: 'Continue',
+          cancelLabel: 'Cancel'
+        });
+        
+        if (shouldContinue) {
           localStorage.setItem('priorityQueueResults', JSON.stringify(results));
           window.location.href = '/priorityqueue-results';
         } else {
@@ -351,11 +364,20 @@ export default function PriorityQueuing() {
         
         // Show accuracy achievement
         if (avgError < 5) {
-          alert(`🎉 Excellent! Achieved ${avgError.toFixed(2)}% average error (target: <5%)\nReady for CEP presentation!`);
+          showSuccess(`🎉 Excellent! Achieved ${avgError.toFixed(2)}% average error (target: <5%)\nReady for CEP presentation!`, {
+            title: 'Simulation Complete - Excellent Accuracy',
+            duration: 8000
+          });
         } else if (avgError < 10) {
-          alert(`✅ Good accuracy: ${avgError.toFixed(2)}% average error\nAcceptable for engineering simulation.`);
+          showSuccess(`✅ Good accuracy: ${avgError.toFixed(2)}% average error\nAcceptable for engineering simulation.`, {
+            title: 'Simulation Complete - Good Accuracy',
+            duration: 6000
+          });
         } else {
-          alert(`⚠️ Moderate accuracy: ${avgError.toFixed(2)}% average error\nConsider increasing doctors or simulation time.`);
+          showWarning(`⚠️ Moderate accuracy: ${avgError.toFixed(2)}% average error\nConsider increasing doctors or simulation time.`, {
+            title: 'Simulation Complete - Moderate Accuracy',
+            duration: 6000
+          });
         }
         
         // Navigate to results page
@@ -364,7 +386,10 @@ export default function PriorityQueuing() {
       
     } catch (error) {
       console.error('Simulation error:', error);
-      alert(`Simulation failed: ${error.message}`);
+      showError(`Simulation failed: ${error.message}`, {
+        title: 'Simulation Error',
+        autoClose: false
+      });
       setIsSimulationRunning(false);
     }
   }, [isValidDistribution, triageDistribution, preemptionEnabled, serviceTimes]);

@@ -22,6 +22,7 @@ export default function Navbar() {
     { name: 'Jackson Model', path: '/jackson-network' },
     { name: 'Poisson Process', path: '/poisson-process' },
     { name: 'Priority Queuing', path: '/priority-queuing' },
+    { name: 'About', path: '/about' },
   ];
 
   const navLinks = isAuthenticated ? afterLoginLinks : beforeLoginLinks;

@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import CustomAlert from './components/CustomAlert';
 import { Landing, Login, Signup, Dashboard, About, JacksonNetwork, NonHomogeneousPoissonProcess } from './pages';
 import JacksonResult from './pages/jackson-result';
 import NHPPResults from './pages/nhpp-results.jsx';
@@ -156,6 +157,7 @@ function App() {
     <Router>
       <div className="pf-app-shell">
         <AnimatedRoutes />
+        <CustomAlert />
       </div>
     </Router>
   );

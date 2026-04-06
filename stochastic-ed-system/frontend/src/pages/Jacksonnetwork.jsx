@@ -28,6 +28,7 @@ import {
   Server,
   ArrowRightLeft
 } from 'lucide-react';
+import { showConfirm } from '../components/CustomAlert';
 
 // Landing-aligned palette for consistent look and feel
 const COLORS = {
@@ -662,7 +663,16 @@ export default function JacksonNetwork() {
         .filter(r => !r.isStable)
         .map(r => r.name);
       
-      if (!window.confirm(`Warning: The following nodes are unstable (ρ ≥ 1.0):\n${unstableNodes.join(', ')}\n\nSimulation results may show infinite queues. Continue anyway?`)) {
+      const shouldContinue = await showConfirm(
+        `The following nodes are unstable (ρ ≥ 1.0):\n${unstableNodes.join(', ')}\n\nSimulation results may show infinite queues. Continue anyway?`,
+        {
+          title: 'System Stability Warning',
+          confirmLabel: 'Continue Anyway',
+          cancelLabel: 'Cancel'
+        }
+      );
+      
+      if (!shouldContinue) {
         return;
       }
     }
