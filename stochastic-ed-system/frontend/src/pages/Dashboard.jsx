@@ -1,35 +1,38 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Activity, Zap, RefreshCw, Clock, Users, Gauge, AlertTriangle,
-  TrendingUp, BarChart3, GitBranch, Layers, ArrowRight, Sliders, RotateCcw
+  TrendingUp, BarChart3, GitBranch, ArrowRight, Sliders, RotateCcw,
+  Stethoscope, Shield, ChevronRight
 } from 'lucide-react';
 
 import MarkovVisualization from '../components/MarkovVisualization';
-import { LOSDistributionChart, QueueLengthChart, ResourceUtilizationChart, SensitivityChart, HeatmapChart } from '../components/Charts';
+import { LOSDistributionChart, QueueLengthChart, ResourceUtilizationChart } from '../components/Charts';
 import ComparisonSection from '../components/ComparisonSection';
 import ExportButtons from '../components/ExportButtons';
-import VisualsSection from '../components/VisualsSection';
 import StabilityIntelligencePanel from '../components/StabilityIntelligencePanel';
 import OverloadWarningModal from '../components/OverloadWarningModal';
 import { simulationApi, markovApi, analysisApi } from '../utils/api';
 import logoSp from '../assets/logo-sp.png';
 
-// Service rate constant (μ) - average patients served per hour per doctor
 const SERVICE_RATE = 3.0;
 
-// Consistent color palette
 const COLORS = {
-  bgLight: '#caf0f8',
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  primary: '#003049',
+  primaryDark: '#003049',
+  secondary: '#669BBC',
+  accent: '#669BBC',
+  alertHint: '#780000',
+  accentDark: '#003049',
+  bgLight: '#edf4fa',
   white: '#ffffff',
-  textDark: '#1a365d',
-  textMuted: '#4a5568',
+  textDark: '#003049',
+  textMuted: '#4f7791',
+  textLight: '#669BBC',
+  border: '#c7dceb',
 };
 
-// Slider configuration
 const SLIDERS = [
   { key: 'arrival_rate', label: 'Arrival Rate (λ)', min: 1, max: 20, step: 0.5, unit: '/hr' },
   { key: 'num_doctors', label: 'Doctors', min: 1, max: 10, step: 1, unit: '' },
@@ -41,56 +44,18 @@ const SLIDERS = [
   { key: 'num_replications', label: 'Replications', min: 50, max: 1000, step: 50, unit: '' },
 ];
 
-// Section header component for consistency
-const SectionHeader = ({ icon: Icon, title, subtitle }) => (
-  <div className="flex items-center gap-3 mb-6">
-    <div 
-      className="p-2.5 rounded-xl"
-      style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-    >
-      <Icon className="w-5 h-5 text-white" />
-    </div>
-    <div>
-      <h2 className="text-xl font-bold" style={{ color: COLORS.textDark }}>{title}</h2>
-      {subtitle && <p className="text-sm" style={{ color: COLORS.textMuted }}>{subtitle}</p>}
-    </div>
+const EKGLoader = () => (
+  <div className="flex items-center gap-3">
+    <svg width="60" height="20" viewBox="0 0 60 20" className="overflow-visible">
+      <path d="M0,10 L10,10 L12,3 L18,17 L22,10 L30,10 L34,5 L38,15 L44,10 L60,10" 
+            stroke={COLORS.primary} fill="none" strokeWidth="2" className="ekg-line"/>
+    </svg>
+    <span className="text-sm font-medium" style={{ color: COLORS.primary }}>Running simulation...</span>
   </div>
 );
 
-// Custom stat card with consistent styling
-const StatCardCustom = ({ icon: Icon, title, value, subtitle, delay = 0, accentColor = COLORS.primary }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay }}
-    whileHover={{ y: -4, boxShadow: '0 12px 24px -8px rgba(0, 119, 182, 0.25)' }}
-    className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden"
-  >
-    <div 
-      className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
-      style={{ background: `linear-gradient(90deg, ${accentColor}, ${COLORS.secondary})` }}
-    />
-    <div className="flex items-start gap-4">
-      <div 
-        className="p-3 rounded-xl flex-shrink-0"
-        style={{ background: `linear-gradient(135deg, ${accentColor}20, ${accentColor}40)` }}
-      >
-        <Icon className="w-5 h-5" style={{ color: accentColor }} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium mb-1" style={{ color: COLORS.textMuted }}>{title}</p>
-        <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-          {typeof value === 'number' ? value.toFixed(2) : value || '—'}
-        </p>
-        {subtitle && (
-          <p className="text-xs font-medium mt-1" style={{ color: COLORS.secondary }}>{subtitle}</p>
-        )}
-      </div>
-    </div>
-  </motion.div>
-);
-
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [params, setParams] = useState({
     arrival_rate: 8.0,
     num_doctors: 3,
@@ -106,26 +71,19 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [simulationData, setSimulationData] = useState(null);
   const [markovData, setMarkovData] = useState(null);
-  const [sensitivityData, setSensitivityData] = useState(null);
   const [longTermData, setLongTermData] = useState(null);
+  const [sensitivityData, setSensitivityData] = useState(null);
   const [error, setError] = useState(null);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
 
-  // Check if we should show results or form
   const showResults = simulationData && !isLoading;
 
-  // Calculate system load factor (ρ = λ / (μ × c))
   const rho = useMemo(() => {
     if (SERVICE_RATE <= 0 || params.num_doctors <= 0) return 0;
     return params.arrival_rate / (SERVICE_RATE * params.num_doctors);
   }, [params.arrival_rate, params.num_doctors]);
 
-  // Calculate maximum stable arrival rate (λ_max = μ × c)
-  const lambdaMax = useMemo(() => {
-    return SERVICE_RATE * params.num_doctors;
-  }, [params.num_doctors]);
-
-  // Check if arrival rate exceeds stable limit
+  const lambdaMax = useMemo(() => SERVICE_RATE * params.num_doctors, [params.num_doctors]);
   const isOverloaded = params.arrival_rate > lambdaMax;
 
   const handleSliderChange = (key, value) => {
@@ -135,12 +93,11 @@ const Dashboard = () => {
   const resetSimulation = () => {
     setSimulationData(null);
     setMarkovData(null);
-    setSensitivityData(null);
     setLongTermData(null);
+    setSensitivityData(null);
     setError(null);
   };
 
-  // Handle run button click - show warning modal if ρ ≥ 1
   const handleRunClick = () => {
     if (rho >= 1) {
       setIsWarningModalOpen(true);
@@ -149,10 +106,13 @@ const Dashboard = () => {
     }
   };
 
-  // Handle modal confirm - close modal and run simulation
   const handleModalConfirm = () => {
     setIsWarningModalOpen(false);
     runSimulation();
+  };
+
+  const goToSensitivityAnalysis = () => {
+    navigate('/sensitivity-analysis', { state: { sensitivityData, params } });
   };
 
   const runSimulation = async () => {
@@ -192,468 +152,281 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.bgLight} 0%, #e0f7fa 100%)` }}>
+    <main className="min-h-screen pt-20" style={{ background: COLORS.bgLight }}>
       <AnimatePresence mode="wait">
-        {/* PARAMETERS FORM VIEW - Split Layout */}
         {!showResults && (
-          <motion.div
+          <motion.section
             key="form-view"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.4 }}
-            className="min-h-[calc(100vh-4rem)] flex"
+            className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-6"
+            aria-label="Simulation Configuration"
           >
-            {/* Left Side - Hero Section */}
-            <div className="hidden lg:flex lg:w-[30%] min-h-[calc(100vh-4rem)] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}>
-              {/* Decorative circles */}
-              <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-10 bg-white" />
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-10 bg-white" />
-              <div className="absolute top-1/3 right-1/4 w-40 h-40 rounded-full opacity-5 bg-white" />
-
-              {/* Hero Content */}
-              <div className="relative z-10 flex flex-col justify-center items-start px-12 xl:px-16 py-12">
-                {/* Logo */}
-                <motion.img
-                  src={logoSp}
-                  alt="SIM-IT Logo"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1, duration: 0.5 }}
-                  className="w-24 h-24 mb-6 rounded-2xl shadow-2xl object-contain bg-white p-2"
-                />
-                
-                <motion.h1 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-5xl xl:text-6xl font-bold text-white mb-4 leading-tight"
-                >
-                  SIM-IT
-                </motion.h1>
-                
-                <motion.div 
-                  initial={{ opacity: 0, scaleX: 0 }}
-                  animate={{ opacity: 1, scaleX: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="w-20 h-1.5 bg-white/50 rounded-full mb-6 origin-left" 
-                />
-                
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-xl text-white/90 leading-relaxed mb-8 max-w-md"
-                >
-                  Advanced Monte Carlo simulation for emergency department optimization
-                </motion.p>
-
-                {/* Feature Tags */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-wrap gap-3 mb-12"
-                >
-                  {['Markov Chains', 'Queueing Theory', 'Monte Carlo'].map((tag, i) => (
-                    <span
-                      key={tag}
-                      className="px-4 py-2 rounded-full text-sm font-medium bg-white/20 text-white border border-white/30 backdrop-blur-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </motion.div>
-
-                {/* Bottom Stats */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="flex gap-12"
-                >
-                  {[
-                    { label: 'Replications', value: '100+' },
-                    { label: 'Parameters', value: '8' },
-                    { label: 'Accuracy', value: '99%' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="text-left">
-                      <p className="text-3xl font-bold text-white">{stat.value}</p>
-                      <p className="text-sm text-white/70">{stat.label}</p>
-                    </div>
-                  ))}
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Right Side - Form + Stability Panel */}
-            <div className="w-full lg:w-[70%] min-h-[calc(100vh-4rem)] flex items-center justify-center px-6 py-8 lg:px-12">
-              {/* Mobile Logo (hidden on desktop) */}
-              <div className="lg:hidden text-center mb-8 w-full">
+            <div className="w-full max-w-7xl mx-auto">
+              <header className="text-center mb-8 lg:hidden">
                 <img 
-                  src={logoSp}
-                  alt="SIM-IT Logo"
-                  className="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-xl object-contain bg-white p-2"
+                  src={logoSp} 
+                  alt="PulseFlow Logo" 
+                  className="w-16 h-16 mx-auto mb-4 rounded-xl shadow-lg object-contain bg-white p-2" 
                 />
-                <h1 className="text-3xl font-bold" style={{ color: COLORS.textDark }}>SIM-IT</h1>
-              </div>
+                <h1 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>PulseFlow ER</h1>
+              </header>
 
-              {/* Grid Layout: Config (7) + Stability (5) */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="w-full max-w-7xl mx-auto"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  {/* Left: Configuration Panel (col-span-6) */}
-                  <div className="lg:col-span-6">
-                    {/* Form Card */}
-                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                      {/* Form Header */}
-                      <div 
-                        className="px-6 py-4 border-b border-gray-100"
-                        style={{ background: `linear-gradient(135deg, ${COLORS.primary}08, ${COLORS.secondary}08)` }}
-                      >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                      >
-                        <Sliders className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold" style={{ color: COLORS.textDark }}>Configure Simulation</h2>
-                        <p className="text-xs" style={{ color: COLORS.textMuted }}>Adjust parameters below</p>
-                      </div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <section className="lg:col-span-7" aria-label="Configuration Panel">
+                  <motion.article
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="bg-white rounded-2xl shadow-lg border overflow-hidden"
+                    style={{ borderColor: COLORS.border }}
+                  >
+                    <header className="px-6 py-5 border-b" style={{ borderColor: COLORS.border }}>
+                      <h2 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Configure Simulation</h2>
+                      <p className="text-xs mt-1" style={{ color: COLORS.textMuted }}>Adjust parameters to run Monte Carlo analysis</p>
+                    </header>
 
-                  {/* Sliders */}
-                  <div className="p-5 space-y-3 max-h-[50vh] overflow-y-auto">
-                    {SLIDERS.map(({ key, label, min, max, step, unit }, index) => (
-                      <motion.div 
-                        key={key} 
-                        className="space-y-1.5"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 + index * 0.05 }}
-                      >
-                        <div className="flex justify-between text-sm">
-                          <label className="font-medium text-sm" style={{ color: COLORS.textDark }}>
-                            {label}
-                            {/* Show max stable value for arrival rate */}
-                            {key === 'arrival_rate' && (
-                              <span className="ml-2 text-xs font-normal" style={{ color: COLORS.textMuted }}>
-                                (max stable: {lambdaMax.toFixed(1)}/hr)
-                              </span>
-                            )}
-                          </label>
-                          <span 
-                            className="font-bold tabular-nums px-2 py-0.5 rounded-md text-xs"
-                            style={{ background: COLORS.accent, color: COLORS.primary }}
-                          >
-                            {params[key]}{unit}
-                          </span>
+                    <div className="p-6 space-y-5 max-h-[55vh] overflow-y-auto custom-scroll">
+                      {SLIDERS.map(({ key, label, min, max, step, unit }, index) => (
+                        <div key={key} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <label htmlFor={`slider-${key}`} className="font-medium text-sm" style={{ color: COLORS.textDark }}>
+                              {label}
+                            </label>
+                            <span className="font-mono text-sm tabular-nums" style={{ color: COLORS.primary }}>
+                              {params[key]}{unit}
+                            </span>
+                          </div>
+                          <input
+                            id={`slider-${key}`}
+                            type="range"
+                            min={min}
+                            max={max}
+                            step={step}
+                            value={params[key]}
+                            onChange={(e) => handleSliderChange(key, parseFloat(e.target.value))}
+                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
+                            style={{ background: `linear-gradient(to right, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}
+                            aria-label={`Adjust ${label}`}
+                          />
+                          {key === 'arrival_rate' && (
+                            <AnimatePresence>
+                              {isOverloaded ? (
+                                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs pt-1" style={{ color: COLORS.alertHint }}>
+                                  ⚠️ Warning: Configuration may lead to system overload
+                                </motion.p>
+                              ) : (
+                                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs pt-1" style={{ color: COLORS.textMuted }}>
+                                  Max stable rate: {lambdaMax.toFixed(1)} patients/hour
+                                </motion.p>
+                              )}
+                            </AnimatePresence>
+                          )}
                         </div>
-                        <motion.input
-                          type="range"
-                          min={min}
-                          max={max}
-                          step={step}
-                          value={params[key]}
-                          onChange={(e) => handleSliderChange(key, parseFloat(e.target.value))}
-                          className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-[#0077b6]"
-                          style={{ background: `linear-gradient(to right, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}
-                          animate={key === 'arrival_rate' && isOverloaded ? { x: [0, -3, 3, -3, 3, 0] } : {}}
-                          transition={{ duration: 0.3 }}
-                        />
-                        {/* Inline validation for arrival rate */}
-                        {key === 'arrival_rate' && (
-                          <AnimatePresence>
-                            {isOverloaded ? (
-                              <motion.p
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="text-xs pt-1"
-                                style={{ color: COLORS.primary }}
-                              >
-                                Current configuration leads to system overload.
-                              </motion.p>
-                            ) : (
-                              <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-xs pt-1"
-                                style={{ color: COLORS.textMuted }}
-                              >
-                                Maximum stable arrival rate with current doctors: {lambdaMax.toFixed(1)} patients/hour
-                              </motion.p>
-                            )}
-                          </AnimatePresence>
-                        )}
-                      </motion.div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
 
-                  {/* Error Message */}
-                  <AnimatePresence>
                     {error && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mx-5 mb-3 p-3 bg-red-50 border border-red-200 rounded-xl"
-                      >
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                          <span className="text-red-700 text-sm font-medium">{error}</span>
-                        </div>
-                      </motion.div>
+                      <aside className="mx-6 mb-3 p-3 rounded-lg" style={{ background: `${COLORS.alertHint}12`, border: `1px solid ${COLORS.alertHint}33` }} role="alert">
+                        <p className="text-sm" style={{ color: COLORS.alertHint }}>{error}</p>
+                      </aside>
                     )}
-                  </AnimatePresence>
 
-                  {/* Run Button */}
-                  <div className="p-5 pt-3 border-t border-gray-100">
-                    <motion.button
-                      whileHover={{ scale: 1.02, boxShadow: '0 12px 30px -5px rgba(0, 119, 182, 0.4)' }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleRunClick}
-                      disabled={isLoading}
-                      className="w-full py-3.5 text-white text-base rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-60"
-                      style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                    >
-                      {isLoading ? (
-                        <>
-                          <RefreshCw className="w-5 h-5 animate-spin" />
-                          Running...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5" />
-                          Run Simulation
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </motion.button>
-                  </div>
-                    </div>
-                  </div>
+                    <footer className="p-6 pt-3 border-t" style={{ borderColor: COLORS.border }}>
+                      <button
+                        onClick={handleRunClick}
+                        disabled={isLoading}
+                        className="w-full py-3 text-white text-base rounded-lg font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-60"
+                        style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
+                        aria-label="Run Simulation"
+                      >
+                        {isLoading ? <EKGLoader /> : <>Run Simulation <ArrowRight className="w-4 h-4" aria-hidden="true" /></>}
+                      </button>
+                    </footer>
+                  </motion.article>
+                </section>
 
-                  {/* Right: Live Stability Intelligence Panel (col-span-6) */}
-                  <div className="lg:col-span-6">
+                <aside className="lg:col-span-5" aria-label="Stability Intelligence">
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                  >
                     <StabilityIntelligencePanel
                       arrivalRate={params.arrival_rate}
                       serviceRate={SERVICE_RATE}
                       numDoctors={params.num_doctors}
                     />
-                  </div>
-                </div>
-              </motion.div>
+                  </motion.div>
+                </aside>
+              </div>
             </div>
-          </motion.div>
+          </motion.section>
         )}
 
-        {/* RESULTS VIEW - Full Dashboard */}
         {showResults && (
-          <motion.div
+          <motion.main
             key="results-view"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
+            className="pb-8 px-6 lg:px-8"
           >
-            <div className="py-8 px-4 sm:px-6 lg:px-8">
-              <div className="max-w-7xl mx-auto">
-                
-                {/* Results Header */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-8"
-                >
-                  <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 relative overflow-hidden">
-                    <div 
-                      className="absolute top-0 right-0 w-64 h-64 opacity-10 rounded-full blur-3xl"
-                      style={{ background: `radial-gradient(circle, ${COLORS.secondary}, transparent)` }}
-                    />
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
-                      <div>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div 
-                            className="p-3 rounded-2xl"
-                            style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                          >
-                            <Activity className="w-7 h-7 text-white" />
-                          </div>
-                          <span 
-                            className="px-3 py-1 rounded-full text-xs font-semibold"
-                            style={{ background: COLORS.accent, color: COLORS.primary }}
-                          >
-                            Simulation Complete
-                          </span>
-                        </div>
-                        <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: COLORS.textDark }}>
-                          SIM-IT Results
-                        </h1>
-                        <p style={{ color: COLORS.textMuted }} className="text-lg max-w-xl">
-                          {params.num_replications} replications completed with λ={params.arrival_rate}/hr and {params.num_doctors} doctors
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <motion.button
-                          onClick={resetSimulation}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="px-5 py-3 rounded-xl font-semibold flex items-center gap-2 border-2 transition-all"
-                          style={{ borderColor: COLORS.primary, color: COLORS.primary }}
-                        >
-                          <RotateCcw className="w-5 h-5" />
-                          New Simulation
-                        </motion.button>
-                        <ExportButtons simulationData={simulationData} />
-                      </div>
+            <div className="max-w-7xl mx-auto">
+              
+              <header className="mb-8">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-medium px-2 py-0.5 rounded inline-block mb-2" style={{ background: `${COLORS.alertHint}14`, color: COLORS.alertHint }}>
+                        SIMULATION COMPLETE
+                      </p>
+                      <h1 className="text-2xl lg:text-3xl font-bold" style={{ color: COLORS.textDark }}>Simulation Results</h1>
+                      <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>
+                        {params.num_replications} replications | λ = {params.arrival_rate}/hr | {params.num_doctors} doctors
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={resetSimulation}
+                        className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all hover:bg-gray-50"
+                        style={{ border: `1px solid ${COLORS.border}`, color: COLORS.textDark }}
+                        aria-label="Start new simulation"
+                      >
+                        <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                        New Simulation
+                      </button>
+                      <ExportButtons simulationData={simulationData} />
                     </div>
                   </div>
-                </motion.div>
+                </div>
+              </header>
 
-                {/* KPI Stats */}
-                <section className="mb-8">
-                  <SectionHeader icon={TrendingUp} title="Key Performance Indicators" subtitle="Real-time simulation metrics" />
-                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                    <StatCardCustom
-                      icon={Clock}
-                      title="Avg Wait Time"
-                      value={simulationData?.metrics?.avg_waiting_time}
-                      subtitle="minutes"
-                      delay={0.1}
-                      accentColor={COLORS.primary}
-                    />
-                    <StatCardCustom
-                      icon={Activity}
-                      title="Avg LOS"
-                      value={simulationData?.metrics?.avg_los}
-                      subtitle="minutes"
-                      delay={0.15}
-                      accentColor={COLORS.secondary}
-                    />
-                    <StatCardCustom
-                      icon={Users}
-                      title="Throughput"
-                      value={simulationData?.metrics?.throughput}
-                      subtitle="patients/hr"
-                      delay={0.2}
-                      accentColor={COLORS.primary}
-                    />
-                    <StatCardCustom
-                      icon={Gauge}
-                      title="Utilization"
-                      value={simulationData?.metrics?.resource_utilization?.doctors}
-                      subtitle="doctors %"
-                      delay={0.25}
-                      accentColor={COLORS.secondary}
-                    />
-                    <StatCardCustom
-                      icon={AlertTriangle}
-                      title="Overload Prob"
-                      value={simulationData?.metrics?.steady_state_overload_probability}
-                      subtitle="steady-state"
-                      delay={0.3}
-                      accentColor="#e53e3e"
-                    />
-                  </div>
-                </section>
+              <section className="mb-8" aria-label="Key Performance Indicators">
+                <header className="mb-6">
+                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Key Performance Indicators</h2>
+                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Core metrics from the simulation</p>
+                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
+                </header>
+                <ul className="grid grid-cols-2 lg:grid-cols-5 gap-4" style={{ listStyle: 'none' }}>
+                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Wait Time</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_waiting_time?.toFixed(2) || '—'}</p>
+                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
+                  </li>
+                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Avg Length of Stay</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.avg_los?.toFixed(2) || '—'}</p>
+                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>minutes</p>
+                  </li>
+                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Throughput</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.throughput?.toFixed(2) || '—'}</p>
+                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>patients/hour</p>
+                  </li>
+                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Doctor Utilization</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.resource_utilization?.doctors?.toFixed(2) || '—'}</p>
+                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>percentage</p>
+                  </li>
+                  <li className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>Overload Probability</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{simulationData?.metrics?.steady_state_overload_probability?.toFixed(2) || '—'}</p>
+                    <p className="text-xs mt-1" style={{ color: COLORS.textLight }}>steady-state</p>
+                  </li>
+                </ul>
+              </section>
 
-                {/* Markov Chain */}
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mb-8"
-                >
-                  <SectionHeader icon={GitBranch} title="Markov Chain Analysis" subtitle="State transitions and steady-state probabilities" />
+              <section className="mb-8" aria-label="Markov Chain Analysis">
+                <header className="mb-6">
+                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Markov Chain Analysis</h2>
+                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>State transitions and steady-state probabilities</p>
+                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
+                </header>
+                <article className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
                   <MarkovVisualization data={markovData} />
-                </motion.section>
+                </article>
+              </section>
 
-                {/* Distribution Charts */}
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="mb-8"
-                >
-                  <SectionHeader icon={BarChart3} title="Distribution Analysis" subtitle="Length of stay and queue dynamics" />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <section className="mb-8" aria-label="Distribution Analysis">
+                <header className="mb-6">
+                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Distribution Analysis</h2>
+                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Length of stay and queue dynamics</p>
+                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
+                </header>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <figure className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Length of Stay Distribution</figcaption>
                     <LOSDistributionChart data={simulationData?.distributions?.los_values} />
+                  </figure>
+                  <figure className="bg-white rounded-xl p-5 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                    <figcaption className="text-sm font-medium mb-4" style={{ color: COLORS.textMuted }}>Queue Length Over Time</figcaption>
                     <QueueLengthChart data={simulationData?.distributions?.queue_length_over_time} />
-                  </div>
-                </motion.section>
+                  </figure>
+                </div>
+              </section>
 
-                {/* Resource & Sensitivity */}
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="mb-8"
-                >
-                  <SectionHeader icon={Layers} title="Resource & Sensitivity Analysis" subtitle="Utilization patterns and parameter impacts" />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <ResourceUtilizationChart data={simulationData?.metrics?.resource_utilization} />
-                    <SensitivityChart data={sensitivityData?.arrival_rate_sensitivity} type="arrival_rate" />
-                  </div>
-                </motion.section>
+              <section className="mb-8" aria-label="Resource Utilization">
+                <header className="mb-6">
+                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Resource Utilization</h2>
+                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Staff and equipment usage patterns</p>
+                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
+                </header>
+                <figure className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
+                  <ResourceUtilizationChart data={simulationData?.metrics?.resource_utilization} />
+                </figure>
+              </section>
 
-                {/* Heatmap */}
-                {sensitivityData?.heatmap && (
-                  <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="mb-8"
-                  >
-                    <HeatmapChart
-                      data={sensitivityData.heatmap.data}
-                      xLabels={sensitivityData.heatmap.x_labels}
-                      yLabels={sensitivityData.heatmap.y_labels}
-                    />
-                  </motion.section>
-                )}
-
-                {/* Comparison Section */}
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                >
+              <section className="mb-8" aria-label="Theoretical Comparison">
+                <header className="mb-6">
+                  <h2 className="text-xl font-semibold tracking-tight" style={{ color: COLORS.textDark }}>Theoretical Comparison</h2>
+                  <p className="text-sm mt-1" style={{ color: COLORS.textMuted }}>Simulated vs theoretical values</p>
+                  <div className="w-12 h-0.5 mt-3 rounded-full" style={{ background: COLORS.accent }} />
+                </header>
+                <article className="bg-white rounded-xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
                   <ComparisonSection
                     theoreticalData={markovData?.theoretical_mmc}
                     simulatedData={simulationData?.metrics}
                     longTermData={longTermData}
                   />
-                </motion.section>
-              </div>
+                </article>
+              </section>
+
+              {sensitivityData && (
+                <nav aria-label="Advanced Analysis Navigation">
+                  <button
+                    onClick={goToSensitivityAnalysis}
+                    className="w-full py-4 rounded-xl flex items-center justify-between group transition-all hover:shadow-md"
+                    style={{ background: COLORS.white, border: `1px solid ${COLORS.border}` }}
+                  >
+                    <span className="px-6">
+                      <span className="text-sm font-medium block" style={{ color: COLORS.textMuted }}>Advanced Analysis</span>
+                      <span className="text-base font-semibold block" style={{ color: COLORS.textDark }}>View Sensitivity & Optimization Results</span>
+                    </span>
+                    <span className="px-6">
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" style={{ color: COLORS.primary }} aria-hidden="true" />
+                    </span>
+                  </button>
+                </nav>
+              )}
             </div>
-            
-            {/* Visuals Section - Full Width */}
-            <div className="pb-12" style={{ background: `linear-gradient(180deg, #e0f7fa 0%, ${COLORS.bgLight} 100%)`, paddingLeft: '3cm', paddingRight: '3cm' }}>
-              <VisualsSection 
-                simulationData={simulationData}
-                sensitivityData={sensitivityData}
-              />
-            </div>
-          </motion.div>
+          </motion.main>
         )}
       </AnimatePresence>
 
-      {/* Overload Warning Modal */}
-      <OverloadWarningModal
-        isOpen={isWarningModalOpen}
-        onClose={() => setIsWarningModalOpen(false)}
-        onConfirm={handleModalConfirm}
-        rho={rho}
-      />
-    </div>
+      <OverloadWarningModal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)} onConfirm={handleModalConfirm} rho={rho} />
+      
+      <style>{`
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #669BBC; border-radius: 10px; }
+        @keyframes ekg-line { 0% { stroke-dashoffset: 200; } 100% { stroke-dashoffset: 0; } }
+        .ekg-line { stroke-dasharray: 200; stroke-dashoffset: 200; animation: ekg-line 1.5s linear infinite; }
+      `}</style>
+    </main>
   );
 };
 

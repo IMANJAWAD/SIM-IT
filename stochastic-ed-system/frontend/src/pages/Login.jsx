@@ -47,6 +47,8 @@ const Login = () => {
   };
 
   const triggerSuccessAnimation = () => {
+    localStorage.setItem('pulseflowAuth', 'true');
+    localStorage.setItem('simitAuth', 'true');
     setShowConfetti(true);
     setShowSuccessMessage(true);
     
@@ -76,10 +78,10 @@ const Login = () => {
   };
 
   // Confetti colors matching theme
-  const confettiColors = ['#caf0f8', '#0077b6', '#00b4d8', '#f0f3bd', '#90e0ef', '#023e8a'];
+  const confettiColors = ['#003049', '#780000', '#C1121F', '#AE1F23', '#669BBC', '#ffffff'];
 
   return (
-    <div className="min-h-screen bg-[#caf0f8] flex items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f5f8fb] flex items-center justify-center px-6 py-12 relative overflow-hidden pt-24">
       {/* Confetti Animation */}
       {showConfetti && (
         <Confetti
@@ -118,11 +120,11 @@ const Login = () => {
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
                 transition={{ duration: 0.5, repeat: 2 }}
-                className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0077b6] to-[#00b4d8] rounded-2xl flex items-center justify-center"
+                className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#C1121F] to-[#AE1F23] rounded-2xl flex items-center justify-center"
               >
                 <Sparkles className="w-8 h-8 text-white" />
               </motion.div>
-              <h2 className="text-2xl font-bold text-[#0077b6] mb-2">Welcome to SIMIT</h2>
+              <h2 className="text-2xl font-bold text-[#780000] mb-2">Welcome to PulseFlow</h2>
               <p className="text-gray-600">Preparing your simulation dashboard...</p>
             </motion.div>
           </motion.div>
@@ -141,7 +143,7 @@ const Login = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 left-10 w-72 h-72 bg-[#00b4d8]/20 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-72 h-72 bg-[#AE1F23]/20 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -153,7 +155,7 @@ const Login = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-[#0077b6]/20 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-96 h-96 bg-[#003049]/20 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -164,7 +166,7 @@ const Login = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#f0f3bd]/20 rounded-full blur-3xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#669BBC]/20 rounded-full blur-3xl"
         />
       </div>
 
@@ -176,15 +178,15 @@ const Login = () => {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-3 mb-8">
-          <img src={logoSp} alt="SIMIT Logo" className="w-14 h-14 rounded-2xl object-contain" />
-          <span className="text-3xl font-bold text-[#0077b6]">SIMIT</span>
+          <img src={logoSp} alt="PulseFlow Logo" className="w-14 h-14 rounded-2xl object-contain bg-white p-1.5 shadow-sm" />
+          <span className="text-3xl font-bold text-[#780000]">PulseFlow</span>
         </Link>
 
         {/* Login Card */}
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
+        <div className="bg-white/75 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-[#003049]/10">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-            <p className="text-gray-600">Sign in to continue your simulations</p>
+            <h1 className="text-2xl font-bold text-[#003049] mb-2">Secure Staff Access</h1>
+            <p className="text-[#557283]">Sign in to continue emergency flow simulation</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -203,7 +205,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="w-full pl-12 pr-4 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                   required
                 />
               </div>
@@ -224,7 +226,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-12 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                   required
                 />
                 <button
@@ -246,11 +248,11 @@ const Login = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-[#0077b6] border-gray-300 rounded focus:ring-[#00b4d8]"
+                  className="w-4 h-4 text-[#C1121F] border-gray-300 rounded focus:ring-[#C1121F]"
                 />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-[#0077b6] hover:text-[#00b4d8] transition-colors">
+              <a href="#" className="text-sm text-[#780000] hover:text-[#C1121F] transition-colors">
                 Forgot password?
               </a>
             </div>
@@ -261,7 +263,7 @@ const Login = () => {
               disabled={isLoading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] text-white rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#0077b6]/30 disabled:opacity-70"
+              className="w-full py-4 bg-gradient-to-r from-[#780000] to-[#C1121F] text-white rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#780000]/30 disabled:opacity-70"
             >
               {isLoading ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -286,7 +288,7 @@ const Login = () => {
             onClick={handleGuestAccess}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-4 bg-[#f0f3bd] text-[#0077b6] rounded-2xl font-semibold flex items-center justify-center gap-2"
+            className="w-full py-4 bg-[#669BBC]/20 text-[#003049] rounded-2xl font-semibold flex items-center justify-center gap-2 border border-[#669BBC]/40"
           >
             <User className="w-5 h-5" />
             Continue as Guest
@@ -295,7 +297,7 @@ const Login = () => {
           {/* Sign Up Link */}
           <p className="text-center mt-6 text-gray-600">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-[#0077b6] font-semibold hover:text-[#00b4d8] transition-colors">
+            <Link to="/signup" className="text-[#780000] font-semibold hover:text-[#C1121F] transition-colors">
               Sign up
             </Link>
           </p>

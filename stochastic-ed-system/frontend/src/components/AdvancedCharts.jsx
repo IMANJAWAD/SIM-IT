@@ -41,7 +41,7 @@ const ArrivalRateSensitivityChart = ({ data }) => {
           />
           <YAxis 
             yAxisId="left" 
-            label={{ value: 'LOS (min)', angle: -90, position: 'insideLeft', offset: 5, fill: '#0077b6', fontSize: 11 }}
+            label={{ value: 'LOS (min)', angle: -90, position: 'insideLeft', offset: 5, fill: '#385a70', fontSize: 11 }}
             tick={{ fill: '#6b7280', fontSize: 11 }}
             domain={['auto', 'auto']}
             tickFormatter={(value) => Math.round(value)}
@@ -49,7 +49,7 @@ const ArrivalRateSensitivityChart = ({ data }) => {
           <YAxis 
             yAxisId="right" 
             orientation="right"
-            label={{ value: 'Throughput', angle: 90, position: 'insideRight', offset: 5, fill: '#00b4d8', fontSize: 11 }}
+            label={{ value: 'Throughput', angle: 90, position: 'insideRight', offset: 5, fill: '#5f7c8d', fontSize: 11 }}
             tick={{ fill: '#6b7280', fontSize: 11 }}
             domain={['auto', 'auto']}
             tickFormatter={(value) => typeof value === 'number' ? value.toFixed(1) : value}
@@ -70,9 +70,9 @@ const ArrivalRateSensitivityChart = ({ data }) => {
             type="monotone" 
             dataKey="avg_los" 
             name="Length of Stay"
-            stroke="#0077b6" 
+            stroke="#385a70" 
             strokeWidth={2}
-            dot={{ fill: '#0077b6', strokeWidth: 1, r: 4 }}
+            dot={{ fill: '#385a70', strokeWidth: 1, r: 4 }}
             activeDot={{ r: 6 }}
             animationDuration={1500}
           />
@@ -81,9 +81,9 @@ const ArrivalRateSensitivityChart = ({ data }) => {
             type="monotone" 
             dataKey="throughput" 
             name="Throughput"
-            stroke="#00b4d8" 
+            stroke="#5f7c8d" 
             strokeWidth={2}
-            dot={{ fill: '#00b4d8', strokeWidth: 1, r: 4 }}
+            dot={{ fill: '#5f7c8d', strokeWidth: 1, r: 4 }}
             activeDot={{ r: 6 }}
             animationDuration={1500}
             animationBegin={300}
@@ -145,8 +145,8 @@ const ResourceUtilizationBarChart = ({ data = defaultUtilizationData }) => {
           <defs>
             {data.map((_, index) => (
               <linearGradient key={index} id={`gradient-${index}`} x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#0077b6" />
-                <stop offset="100%" stopColor="#00b4d8" />
+                <stop offset="0%" stopColor="#385a70" />
+                <stop offset="100%" stopColor="#5f7c8d" />
               </linearGradient>
             ))}
           </defs>
@@ -187,10 +187,10 @@ const OptimizationBarChart = ({ data = defaultOptimizationBarData }) => {
             }}
           />
           <Legend wrapperStyle={{ fontSize: '11px' }} iconType="circle" />
-          <Bar dataKey="baseline" name="Baseline" fill="#caf0f8" stroke="#0077b6" strokeWidth={1} radius={[3, 3, 0, 0]} animationDuration={1000} />
-          <Bar dataKey="config1" name="Config 1" fill="#0077b6" radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={100} />
-          <Bar dataKey="config2" name="Config 2" fill="#00b4d8" radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={200} />
-          <Bar dataKey="config3" name="Config 3 (Best)" fill="#f0f3bd" stroke="#0077b6" strokeWidth={1} radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={300} />
+          <Bar dataKey="baseline" name="Baseline" fill="#f5f8fb" stroke="#385a70" strokeWidth={1} radius={[3, 3, 0, 0]} animationDuration={1000} />
+          <Bar dataKey="config1" name="Config 1" fill="#385a70" radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={100} />
+          <Bar dataKey="config2" name="Config 2" fill="#5f7c8d" radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={200} />
+          <Bar dataKey="config3" name="Config 3 (Best)" fill="#b7c7d2" stroke="#385a70" strokeWidth={1} radius={[3, 3, 0, 0]} animationDuration={1000} animationBegin={300} />
         </BarChart>
       </ResponsiveContainer>
     </div>

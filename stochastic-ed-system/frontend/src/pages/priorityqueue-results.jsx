@@ -42,7 +42,16 @@ const TRIAGE_COLORS = {
   level3: '#d97706', // Yellow - Urgent
   level4: '#16a34a', // Green - Less Urgent
   level5: '#2563eb', // Blue - Non-Urgent
-  background: '#caf0f8',
+  background: '#edf4fa',
+};
+
+const UI_COLORS = {
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
 };
 
 const TRIAGE_LEVELS = [
@@ -84,7 +93,7 @@ export default function PriorityQueueResults() {
   if (loading) {
     return (
       <div className="min-h-screen pt-16 flex items-center justify-center" 
-           style={{ background: `linear-gradient(180deg, ${TRIAGE_COLORS.background} 0%, #e0f7fa 100%)` }}>
+           style={{ background: TRIAGE_COLORS.background }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <div className="text-xl font-semibold text-gray-700">Loading Priority Queue Results...</div>
@@ -96,7 +105,7 @@ export default function PriorityQueueResults() {
   if (error) {
     return (
       <div className="min-h-screen pt-16 flex items-center justify-center" 
-           style={{ background: `linear-gradient(180deg, ${TRIAGE_COLORS.background} 0%, #e0f7fa 100%)` }}>
+           style={{ background: TRIAGE_COLORS.background }}>
         <div className="text-center">
           <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <div className="text-xl font-semibold text-gray-700 mb-4">{error}</div>
@@ -130,40 +139,38 @@ export default function PriorityQueueResults() {
 
   return (
     <div className="min-h-screen pt-16" 
-         style={{ background: `linear-gradient(180deg, ${TRIAGE_COLORS.background} 0%, #e0f7fa 100%)` }}>
+         style={{ background: TRIAGE_COLORS.background }}>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-8 bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: UI_COLORS.border }}>
           
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-6"
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={goBack}
-                    className="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="p-3 rounded-xl transition-colors"
+                    style={{ background: `${UI_COLORS.secondary}20` }}
                   >
-                    <ArrowLeft className="w-6 h-6 text-gray-600" />
+                    <ArrowLeft className="w-6 h-6" style={{ color: UI_COLORS.textMuted }} />
                   </button>
                   <div>
-                    <h1 className="text-4xl font-bold text-gray-800">
+                    <h1 className="text-4xl font-bold" style={{ color: UI_COLORS.textDark }}>
                       Priority Queue Results
                     </h1>
-                    <p className="text-gray-600 text-lg mt-2">
+                    <p className="text-lg mt-2" style={{ color: UI_COLORS.textMuted }}>
                       Theoretical vs Simulation Analysis for M/M/c Priority System
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    results?.validation?.system_stable 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: results?.validation?.system_stable ? '#d9f2ed' : `${UI_COLORS.alertHint}12`, color: results?.validation?.system_stable ? '#1d7f73' : UI_COLORS.alertHint }}>
                     {results?.validation?.system_stable ? (
                       <>
                         <CheckCircle className="w-4 h-4 inline mr-1" />
@@ -176,11 +183,7 @@ export default function PriorityQueueResults() {
                       </>
                     )}
                   </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    results?.parameters?.preemptive 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
+                  <span className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: results?.parameters?.preemptive ? '#d9f2ed' : `${UI_COLORS.secondary}20`, color: results?.parameters?.preemptive ? '#1d7f73' : UI_COLORS.primary }}>
                     {results?.parameters?.preemptive ? (
                       <>
                         <Zap className="w-4 h-4 inline mr-1" />
@@ -204,9 +207,9 @@ export default function PriorityQueueResults() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Calculator className="w-6 h-6 text-blue-600" />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                <Calculator className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                 System Parameters & Configuration
               </h2>
               
@@ -308,6 +311,8 @@ export default function PriorityQueueResults() {
             </div>
           </motion.div>
 
+          </div>
+
           {/* Theoretical vs Simulation Comparison */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -315,9 +320,9 @@ export default function PriorityQueueResults() {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-6 h-6 text-purple-600" />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                <BarChart3 className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                 Theoretical vs Simulation Comparison
               </h2>
               
@@ -408,9 +413,9 @@ export default function PriorityQueueResults() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Theoretical Results */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Calculator className="w-5 h-5 text-blue-600" />
+              <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                  <Calculator className="w-5 h-5" style={{ color: UI_COLORS.primary }} />
                   Theoretical M/M/c Results
                 </h3>
                 
@@ -459,9 +464,9 @@ export default function PriorityQueueResults() {
               </div>
 
               {/* Simulation Results */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-green-600" />
+              <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                  <Activity className="w-5 h-5" style={{ color: UI_COLORS.primary }} />
                   Monte Carlo Simulation Results
                 </h3>
                 
@@ -515,9 +520,9 @@ export default function PriorityQueueResults() {
             transition={{ delay: 0.4 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Target className="w-6 h-6 text-orange-600" />
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                <Target className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                 Monte Carlo Confidence Intervals (95%)
               </h2>
               
@@ -553,8 +558,8 @@ export default function PriorityQueueResults() {
             transition={{ delay: 0.5 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
                 <Award className="w-6 h-6 text-gold-600" />
                 Performance Summary & Insights
               </h2>
@@ -667,11 +672,12 @@ export default function PriorityQueueResults() {
             transition={{ delay: 0.6 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <button
                   onClick={goBack}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+                  className="px-8 py-4 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+                  style={{ background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }}
                 >
                   <div className="flex items-center gap-3">
                     <ArrowLeft className="w-6 h-6" />
@@ -681,7 +687,8 @@ export default function PriorityQueueResults() {
                 
                 <button
                   onClick={() => window.print()}
-                  className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+                  className="px-8 py-4 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+                  style={{ background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }}
                 >
                   <div className="flex items-center gap-3">
                     <Timer className="w-6 h-6" />

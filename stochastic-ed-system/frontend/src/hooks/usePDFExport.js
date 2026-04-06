@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 const usePDFExport = () => {
   const [isExporting, setIsExporting] = useState(false);
 
-  const exportToPDF = async (elementId, filename = 'SIMIT_Simulation_Report.pdf') => {
+  const exportToPDF = async (elementId, filename = 'PulseFlow_Simulation_Report.pdf') => {
     setIsExporting(true);
 
     try {
@@ -32,17 +32,17 @@ const usePDFExport = () => {
       const pdf = new jsPDF('p', 'mm', 'a4');
       
       // Add title page
-      pdf.setFillColor(0, 119, 182); // #0077b6
+      pdf.setFillColor(120, 0, 0);
       pdf.rect(0, 0, 210, 50, 'F');
       
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(28);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('SIMIT', 20, 25);
+      pdf.text('PulseFlow', 20, 25);
       
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Simulation Intelligence & Modeling Interface Tool', 20, 35);
+      pdf.text('A Stochastic Optimization System for Emergency Departments', 20, 35);
       
       // Reset text color
       pdf.setTextColor(0, 0, 0);
@@ -115,7 +115,7 @@ const usePDFExport = () => {
       
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(0, 119, 182);
+      pdf.setTextColor(0, 48, 73);
       pdf.text('Analysis Results & Visualizations', 20, 20);
       pdf.setTextColor(0, 0, 0);
       
@@ -150,7 +150,7 @@ const usePDFExport = () => {
         pdf.setFontSize(8);
         pdf.setTextColor(150, 150, 150);
         pdf.text(
-          `SIMIT Report - Page ${i} of ${pageCount}`,
+          `PulseFlow Report - Page ${i} of ${pageCount}`,
           pdf.internal.pageSize.getWidth() / 2,
           pdf.internal.pageSize.getHeight() - 10,
           { align: 'center' }

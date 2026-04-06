@@ -27,13 +27,13 @@ const icons = {
   overload: AlertTriangle,
 };
 
-// STRICT COLORS ONLY: #caf0f8, #0077b6, #00b4d8, #f0f3bd
+// STRICT COLORS ONLY: #f5f8fb, #C1121F, #AE1F23, #669BBC
 const colors = {
-  waitingTime: { bg: '#0077b6' },
-  los: { bg: '#0077b6' },
-  throughput: { bg: '#00b4d8' },
-  utilization: { bg: '#00b4d8' },
-  overload: { bg: '#0077b6' },
+  waitingTime: { bg: '#C1121F' },
+  los: { bg: '#C1121F' },
+  throughput: { bg: '#AE1F23' },
+  utilization: { bg: '#AE1F23' },
+  overload: { bg: '#C1121F' },
 };
 
 export default function StatCard({ type, title, value, subtitle, index = 0, confidenceInterval }) {
@@ -76,7 +76,7 @@ export default function StatCard({ type, title, value, subtitle, index = 0, conf
             <p className="kpi-unit">{subtitle}</p>
           )}
           {confidenceInterval && (
-            <p className="text-xs mt-1" style={{ color: '#0077b6' }}>
+            <p className="text-xs mt-1" style={{ color: '#C1121F' }}>
               95% CI: [{confidenceInterval[0]?.toFixed(2)}, {confidenceInterval[1]?.toFixed(2)}]
             </p>
           )}

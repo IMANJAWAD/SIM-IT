@@ -41,13 +41,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 // Color palette
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  accent: '#669BBC',
+  light: '#f5f8fb',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
+  success: '#2a9d8f',
+  warning: '#669BBC',
+  danger: '#780000',
   white: '#ffffff',
 };
 
@@ -112,8 +116,8 @@ function ResultHospitalNode({ data }) {
             <Icon className="w-5 h-5" style={{ color: heatColor }} />
           </div>
           <div>
-            <h3 className="font-bold text-sm text-gray-800">{label}</h3>
-            <p className="text-xs text-gray-500">{type}</p>
+            <h3 className="font-bold text-sm" style={{ color: COLORS.textDark }}>{label}</h3>
+            <p className="text-xs" style={{ color: COLORS.textMuted }}>{type}</p>
           </div>
         </div>
 
@@ -122,7 +126,7 @@ function ResultHospitalNode({ data }) {
           {/* Utilization bar */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-gray-600">Utilization (ρ)</span>
+              <span className="text-xs font-medium" style={{ color: COLORS.textMuted }}>Utilization (ρ)</span>
               <span className="text-xs font-bold" style={{ color: heatColor }}>
                 {utilizationPercent.toFixed(0)}%
               </span>
@@ -141,14 +145,14 @@ function ResultHospitalNode({ data }) {
           {/* Stats row */}
           <div className="flex justify-between text-xs">
             <div className="flex items-center gap-1">
-              <Users className="w-3 h-3 text-gray-500" />
-              <span className="text-gray-600">Servers: </span>
-              <span className="font-bold text-gray-800">{servers}</span>
+              <Users className="w-3 h-3" style={{ color: COLORS.textMuted }} />
+              <span style={{ color: COLORS.textMuted }}>Servers: </span>
+              <span className="font-bold" style={{ color: COLORS.textDark }}>{servers}</span>
             </div>
             <div className="flex items-center gap-1">
-              <Activity className="w-3 h-3 text-gray-500" />
-              <span className="text-gray-600">Queue: </span>
-              <span className="font-bold text-gray-800">{patients}</span>
+              <Activity className="w-3 h-3" style={{ color: COLORS.textMuted }} />
+              <span style={{ color: COLORS.textMuted }}>Queue: </span>
+              <span className="font-bold" style={{ color: COLORS.textDark }}>{patients}</span>
             </div>
           </div>
         </div>
@@ -403,7 +407,7 @@ export default function JacksonResult() {
   const progress = timeSeriesData.length > 0 ? (currentTimeIndex / (timeSeriesData.length - 1)) * 100 : 0;
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.light} 0%, #e0f7fa 100%)` }}>
+    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.light} 0%, #e9f2f9 78%, #f8f1f2 100%)` }}>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           
@@ -413,21 +417,22 @@ export default function JacksonResult() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-3xl p-8 shadow-lg border" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <motion.button
                     onClick={() => navigate('/jackson-network')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-colors"
+                    className="p-3 rounded-xl border-2 transition-colors"
+                    style={{ borderColor: COLORS.border }}
                   >
-                    <ArrowLeft className="w-6 h-6 text-gray-600" />
+                    <ArrowLeft className="w-6 h-6" style={{ color: COLORS.textMuted }} />
                   </motion.button>
                   
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Jackson Network Results</h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-3xl font-bold" style={{ color: COLORS.textDark }}>Jackson Network Results</h1>
+                    <p style={{ color: COLORS.textMuted }}>
                       Live simulation with {timeSeriesData.length} time points over {jacksonResults.simulation_config?.duration_minutes || 0} minutes
                     </p>
                   </div>
@@ -436,8 +441,8 @@ export default function JacksonResult() {
                 {/* Playback Controls */}
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">Current Time</p>
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-sm" style={{ color: COLORS.textMuted }}>Current Time</p>
+                    <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
                       {currentTimePoint?.timestamp || '0:00'}
                     </p>
                   </div>
@@ -457,7 +462,7 @@ export default function JacksonResult() {
               
               {/* Progress Bar */}
               <div className="mt-6">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <div className="flex justify-between text-sm mb-2" style={{ color: COLORS.textMuted }}>
                   <span>Simulation Progress</span>
                   <span>{progress.toFixed(1)}%</span>
                 </div>
@@ -486,33 +491,34 @@ export default function JacksonResult() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl shadow-lg border border-blue-200 p-6"
+              className="mb-8 rounded-3xl shadow-lg border p-6"
+              style={{ background: `linear-gradient(90deg, ${COLORS.primary}08, ${COLORS.accent}18)`, borderColor: COLORS.border }}
             >
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Current System Status</h2>
+                <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.textDark }}>Current System Status</h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
-                  <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
                     {currentTimePoint.system_metrics?.avg_utilization || 0}%
                   </p>
-                  <p className="text-sm text-gray-600">Avg Utilization</p>
+                    <p className="text-sm" style={{ color: COLORS.textMuted }}>Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
-                  <p className="text-2xl font-bold text-orange-600">
+                    <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
                     {currentTimePoint.system_metrics?.peak_utilization || 0}%
                   </p>
-                  <p className="text-sm text-gray-600">Peak Utilization</p>
+                    <p className="text-sm" style={{ color: COLORS.textMuted }}>Peak Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
-                  <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold" style={{ color: COLORS.success }}>
                     {currentTimePoint.system_metrics?.total_throughput || 0}
                   </p>
-                  <p className="text-sm text-gray-600">Throughput/hr</p>
+                    <p className="text-sm" style={{ color: COLORS.textMuted }}>Throughput/hr</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
-                  <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-2xl font-bold" style={{ color: COLORS.secondary }}>
                     {currentTimePoint.system_metrics?.total_queue_length || 0}
                   </p>
-                  <p className="text-sm text-gray-600">Total Queue</p>
+                    <p className="text-sm" style={{ color: COLORS.textMuted }}>Total Queue</p>
                 </div>
               </div>
             </motion.div>
@@ -523,12 +529,12 @@ export default function JacksonResult() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-8 bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
-            style={{ height: '600px' }}
+            className="mb-8 bg-white rounded-3xl shadow-lg border overflow-hidden"
+            style={{ borderColor: COLORS.border, height: '600px' }}
           >
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">Hospital Network Flow</h2>
-              <p className="text-gray-600">Real-time patient flow through departments</p>
+            <div className="p-6 border-b" style={{ borderColor: COLORS.border }}>
+              <h2 className="text-xl font-bold" style={{ color: COLORS.textDark }}>Hospital Network Flow</h2>
+              <p style={{ color: COLORS.textMuted }}>Real-time patient flow through departments</p>
             </div>
             <div className="h-full">
               <ReactFlow
@@ -542,13 +548,14 @@ export default function JacksonResult() {
                 proOptions={{ hideAttribution: true }}
               >
                 <Background 
-                  color="#e5e7eb" 
+                  color={COLORS.border}
                   gap={20} 
                   size={1}
-                  style={{ backgroundColor: '#f9fafb' }}
+                  style={{ backgroundColor: '#f7fbff' }}
                 />
                 <Controls 
-                  className="bg-white rounded-lg shadow-lg border border-gray-200"
+                  className="bg-white rounded-lg shadow-lg border"
+                  style={{ borderColor: COLORS.border }}
                 />
               </ReactFlow>
             </div>
@@ -559,7 +566,8 @@ export default function JacksonResult() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mb-8 bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
+            className="mb-8 bg-white rounded-3xl shadow-lg border overflow-hidden"
+            style={{ borderColor: COLORS.border }}
           >
             <div className="p-6">
               <div className="flex items-center gap-3 mb-6">
@@ -570,8 +578,8 @@ export default function JacksonResult() {
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Live Analytics Dashboard</h2>
-                  <p className="text-gray-600">System throughput and queue analysis over time</p>
+                  <h2 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>Live Analytics Dashboard</h2>
+                  <p style={{ color: COLORS.textMuted }}>System throughput and queue analysis over time</p>
                 </div>
               </div>
 
@@ -580,14 +588,14 @@ export default function JacksonResult() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <LineChart className="w-5 h-5" style={{ color: COLORS.primary }} />
-                    <h3 className="text-lg font-semibold text-gray-800">System Throughput</h3>
+                    <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>System Throughput</h3>
                   </div>
                   
                   <div className="h-64 w-full">
                     {analyticsData.throughputHistory.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <RechartsLineChart data={analyticsData.throughputHistory}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                          <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
                           <XAxis 
                             dataKey="time" 
                             tick={{ fontSize: 11 }}
@@ -639,14 +647,14 @@ export default function JacksonResult() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Users className="w-5 h-5" style={{ color: COLORS.secondary }} />
-                    <h3 className="text-lg font-semibold text-gray-800">Queue Lengths by Department</h3>
+                    <h3 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>Queue Lengths by Department</h3>
                   </div>
                   
                   <div className="h-64 w-full">
                     {analyticsData.queueHistory.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={analyticsData.queueHistory.slice(-10)}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                          <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
                           <XAxis 
                             dataKey="time" 
                             tick={{ fontSize: 11 }}
@@ -684,7 +692,7 @@ export default function JacksonResult() {
                           />
                           <Bar 
                             dataKey="xray" 
-                            fill={COLORS.warning}
+                            fill={COLORS.secondary}
                             name="X-Ray"
                             radius={[2, 2, 0, 0]}
                           />
@@ -710,27 +718,28 @@ export default function JacksonResult() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6"
+              className="bg-white rounded-3xl shadow-lg border p-6"
+              style={{ borderColor: COLORS.border }}
             >
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Simulation Summary</h2>
+              <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.textDark }}>Simulation Summary</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-4 rounded-xl bg-gray-50">
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
                     {jacksonResults.simulation_summary.final_avg_utilization}%
                   </p>
-                  <p className="text-sm text-gray-600">Final Avg Utilization</p>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-50">
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
                     {jacksonResults.simulation_summary.final_peak_utilization}%
                   </p>
-                  <p className="text-sm text-gray-600">Final Peak Utilization</p>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Peak Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-50">
-                  <p className={`text-2xl font-bold ${jacksonResults.simulation_summary.system_stability === 'Stable' ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className="text-2xl font-bold" style={{ color: jacksonResults.simulation_summary.system_stability === 'Stable' ? COLORS.success : COLORS.alertHint }}>
                     {jacksonResults.simulation_summary.system_stability}
                   </p>
-                  <p className="text-sm text-gray-600">System Status</p>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>System Status</p>
                 </div>
               </div>
             </motion.div>

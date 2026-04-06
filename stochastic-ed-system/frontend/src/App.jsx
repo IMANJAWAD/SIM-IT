@@ -8,6 +8,7 @@ import JacksonResult from './pages/jackson-result';
 import NHPPResults from './pages/nhpp-results.jsx';
 import PriorityQueuing from './pages/PriorityQueuing';
 import PriorityQueueResults from './pages/priorityqueue-results';
+import SensitivityAnalysis from './pages/SensitivityAnalysis';
 
 import './App.css';
 
@@ -43,7 +44,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/login"
           element={
-            <Layout showNavbar={false} showFooter={false}>
+            <Layout showNavbar={true} showFooter={false}>
               <Login />
             </Layout>
           }
@@ -51,7 +52,7 @@ const AnimatedRoutes = () => {
         <Route
           path="/signup"
           element={
-            <Layout showNavbar={false} showFooter={false}>
+            <Layout showNavbar={true} showFooter={false}>
               <Signup />
             </Layout>
           }
@@ -136,6 +137,15 @@ const AnimatedRoutes = () => {
             </Layout>
           }
         />
+
+        <Route
+          path="/sensitivity-analysis"
+          element={
+            <Layout>
+              <SensitivityAnalysis />
+            </Layout>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -144,7 +154,7 @@ const AnimatedRoutes = () => {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#caf0f8]">
+      <div className="pf-app-shell">
         <AnimatedRoutes />
       </div>
     </Router>

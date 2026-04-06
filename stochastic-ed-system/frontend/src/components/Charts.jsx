@@ -3,33 +3,26 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, AreaChart, Area, Legend, Cell
 } from 'recharts';
-import { BarChart3, TrendingUp, Activity, Layers } from 'lucide-react';
 
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
+  primary: '#003049',
+  secondary: '#669BBC',
+  accent: '#d9e8f2',
+  alertHint: '#780000',
+  light: '#f5f8fb',
   textMuted: '#4a5568',
 };
 
-function ChartContainer({ title, icon: Icon, children, className = '' }) {
+function ChartContainer({ title, children, className = '' }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ boxShadow: '0 8px 24px rgba(0,119,182,0.12)' }}
-      className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden ${className}`}
+      className={`bg-white rounded-lg border border-[#d8e0e6] overflow-hidden ${className}`}
     >
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
-        <div 
-          className="p-2 rounded-xl"
-          style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-        >
-          <Icon className="w-4 h-4 text-white" />
-        </div>
-        <h3 className="text-base font-semibold" style={{ color: '#1a365d' }}>{title}</h3>
+      <div className="px-5 py-4 border-b border-gray-100 bg-white">
+        <h3 className="text-base font-semibold" style={{ color: COLORS.primary }}>{title}</h3>
       </div>
       <div className="p-5">{children}</div>
     </motion.div>
@@ -39,7 +32,7 @@ function ChartContainer({ title, icon: Icon, children, className = '' }) {
 export function LOSDistributionChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <ChartContainer title="LOS Distribution" icon={BarChart3}>
+      <ChartContainer title="LOS Distribution">
         <div className="h-[250px] flex items-center justify-center text-gray-400">
           No data available
         </div>
@@ -57,7 +50,7 @@ export function LOSDistributionChart({ data }) {
   }
 
   return (
-    <ChartContainer title="Length of Stay Distribution" icon={BarChart3}>
+    <ChartContainer title="Length of Stay Distribution">
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={bins.slice(0, 10)}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -66,7 +59,7 @@ export function LOSDistributionChart({ data }) {
           <Tooltip
             contentStyle={{
               background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #00b4d8',
+              border: '1px solid #b7c7d2',
               borderRadius: '12px',
             }}
           />
@@ -84,7 +77,7 @@ export function LOSDistributionChart({ data }) {
 export function QueueLengthChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <ChartContainer title="Queue Length Over Time" icon={TrendingUp}>
+      <ChartContainer title="Queue Length Over Time">
         <div className="h-[250px] flex items-center justify-center text-gray-400">
           No data available
         </div>
@@ -93,7 +86,7 @@ export function QueueLengthChart({ data }) {
   }
 
   return (
-    <ChartContainer title="Queue Length Over Time" icon={TrendingUp}>
+    <ChartContainer title="Queue Length Over Time">
       <ResponsiveContainer width="100%" height={250}>
         <AreaChart data={data}>
           <defs>
@@ -112,7 +105,7 @@ export function QueueLengthChart({ data }) {
           <Tooltip
             contentStyle={{
               background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #00b4d8',
+              border: '1px solid #b7c7d2',
               borderRadius: '12px',
             }}
             formatter={(value) => [value.toFixed(2), 'Queue Length']}
@@ -135,7 +128,7 @@ export function QueueLengthChart({ data }) {
 export function ResourceUtilizationChart({ data }) {
   if (!data) {
     return (
-      <ChartContainer title="Resource Utilization" icon={Activity}>
+      <ChartContainer title="Resource Utilization">
         <div className="h-[250px] flex items-center justify-center text-gray-400">
           No data available
         </div>
@@ -146,11 +139,11 @@ export function ResourceUtilizationChart({ data }) {
   const chartData = [
     { name: 'Doctors', utilization: data.doctors || 0, color: COLORS.primary },
     { name: 'Nurses', utilization: data.nurses || 0, color: COLORS.secondary },
-    { name: 'X-Ray', utilization: data.xray || 0, color: '#bfcc47' },
+    { name: 'X-Ray', utilization: data.xray || 0, color: '#8fb4cc' },
   ];
 
   return (
-    <ChartContainer title="Resource Utilization" icon={Activity}>
+    <ChartContainer title="Resource Utilization">
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={chartData} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" horizontal={false} />
@@ -159,7 +152,7 @@ export function ResourceUtilizationChart({ data }) {
           <Tooltip
             contentStyle={{
               background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #00b4d8',
+              border: '1px solid #b7c7d2',
               borderRadius: '12px',
             }}
             formatter={(value) => [`${value.toFixed(1)}%`, 'Utilization']}
@@ -178,7 +171,7 @@ export function ResourceUtilizationChart({ data }) {
 export function SensitivityChart({ data, type = 'arrival_rate' }) {
   if (!data || data.length === 0) {
     return (
-      <ChartContainer title="Sensitivity Analysis" icon={Layers}>
+      <ChartContainer title="Sensitivity Analysis">
         <div className="h-[250px] flex items-center justify-center text-gray-400">
           No data available
         </div>
@@ -190,7 +183,7 @@ export function SensitivityChart({ data, type = 'arrival_rate' }) {
   const xLabel = type === 'arrival_rate' ? 'Arrival Rate (λ)' : 'Number of Doctors';
 
   return (
-    <ChartContainer title={`Impact of ${xLabel}`} icon={Layers}>
+    <ChartContainer title={`Impact of ${xLabel}`}>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -200,7 +193,7 @@ export function SensitivityChart({ data, type = 'arrival_rate' }) {
           <Tooltip
             contentStyle={{
               background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #00b4d8',
+              border: '1px solid #b7c7d2',
               borderRadius: '12px',
             }}
           />
@@ -232,7 +225,7 @@ export function SensitivityChart({ data, type = 'arrival_rate' }) {
 export function HeatmapChart({ data, xLabels, yLabels }) {
   if (!data || data.length === 0) {
     return (
-      <ChartContainer title="Waiting Time Heatmap" icon={Layers}>
+      <ChartContainer title="Waiting Time Heatmap">
         <div className="h-[250px] flex items-center justify-center text-gray-400">
           No data available
         </div>
@@ -245,14 +238,14 @@ export function HeatmapChart({ data, xLabels, yLabels }) {
 
   const getColorAndText = (val) => {
     const ratio = (val - minVal) / (maxVal - minVal || 1);
-    // Use accent (#f0f3bd) for low, secondary (#00b4d8) for mid, primary (#0077b6) for high
+    // Keep results blue-dominant; reserve a subtle gochujang tint for highest values.
     if (ratio < 0.33) return { bg: COLORS.accent, text: COLORS.primary };
     if (ratio < 0.66) return { bg: COLORS.secondary, text: '#ffffff' };
-    return { bg: COLORS.primary, text: '#ffffff' };
+    return { bg: `${COLORS.alertHint}1A`, text: COLORS.primary };
   };
 
   return (
-    <ChartContainer title="Waiting Time Heatmap (Doctors vs Arrival Rate)" icon={Layers}>
+    <ChartContainer title="Waiting Time Heatmap (Doctors vs Arrival Rate)">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

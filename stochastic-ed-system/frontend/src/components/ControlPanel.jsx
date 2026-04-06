@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { Play, RefreshCw, Sliders, ChevronDown, ChevronUp } from 'lucide-react';
 
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  primary: '#C1121F',
+  secondary: '#AE1F23',
+  accent: '#669BBC',
   textDark: '#1a365d',
 };
 
@@ -79,7 +79,7 @@ export default function ControlPanel({ params, setParams, onRunSimulation, isLoa
                 step={step}
                 value={params[key]}
                 onChange={(e) => handleSliderChange(key, parseFloat(e.target.value))}
-                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#0077b6]"
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#C1121F]"
                 style={{ background: `linear-gradient(to right, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)` }}
               />
             </div>

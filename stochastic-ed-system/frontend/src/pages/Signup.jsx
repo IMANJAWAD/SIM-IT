@@ -53,6 +53,8 @@ const Signup = () => {
   };
 
   const triggerSuccessAnimation = () => {
+    localStorage.setItem('pulseflowAuth', 'true');
+    localStorage.setItem('simitAuth', 'true');
     setShowConfetti(true);
     setShowSuccessMessage(true);
     
@@ -78,7 +80,7 @@ const Signup = () => {
   };
 
   // Confetti colors matching theme
-  const confettiColors = ['#caf0f8', '#0077b6', '#00b4d8', '#f0f3bd', '#90e0ef', '#023e8a'];
+  const confettiColors = ['#003049', '#780000', '#C1121F', '#AE1F23', '#669BBC', '#ffffff'];
 
   const benefits = [
     'Run unlimited simulations',
@@ -88,7 +90,7 @@ const Signup = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#caf0f8] flex items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f5f8fb] flex items-center justify-center px-6 py-12 relative overflow-hidden pt-24">
       {/* Confetti Animation */}
       {showConfetti && (
         <Confetti
@@ -127,11 +129,11 @@ const Signup = () => {
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
                 transition={{ duration: 0.5, repeat: 2 }}
-                className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0077b6] to-[#00b4d8] rounded-2xl flex items-center justify-center"
+                className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#C1121F] to-[#AE1F23] rounded-2xl flex items-center justify-center"
               >
                 <Sparkles className="w-8 h-8 text-white" />
               </motion.div>
-              <h2 className="text-2xl font-bold text-[#0077b6] mb-2">Welcome to SIMIT</h2>
+              <h2 className="text-2xl font-bold text-[#780000] mb-2">Welcome to PulseFlow</h2>
               <p className="text-gray-600">Account created! Preparing your dashboard...</p>
             </motion.div>
           </motion.div>
@@ -150,7 +152,7 @@ const Signup = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 right-10 w-72 h-72 bg-[#00b4d8]/20 rounded-full blur-3xl"
+          className="absolute top-20 right-10 w-72 h-72 bg-[#AE1F23]/20 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -162,7 +164,7 @@ const Signup = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute bottom-20 left-10 w-96 h-96 bg-[#0077b6]/20 rounded-full blur-3xl"
+          className="absolute bottom-20 left-10 w-96 h-96 bg-[#003049]/20 rounded-full blur-3xl"
         />
       </div>
 
@@ -175,8 +177,8 @@ const Signup = () => {
           className="hidden md:block"
         >
           <Link to="/" className="flex items-center gap-3 mb-8">
-            <img src={logoSp} alt="SIMIT Logo" className="w-16 h-16 rounded-2xl object-contain" />
-            <span className="text-4xl font-bold text-[#0077b6]">SIMIT</span>
+            <img src={logoSp} alt="PulseFlow Logo" className="w-16 h-16 rounded-2xl object-contain bg-white p-1.5 shadow-sm" />
+            <span className="text-4xl font-bold text-[#780000]">PulseFlow</span>
           </Link>
 
           <h1 className="text-3xl font-bold text-gray-800 mb-4">
@@ -195,8 +197,8 @@ const Signup = () => {
                 transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-8 h-8 rounded-full bg-[#00b4d8]/20 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-[#0077b6]" />
+                <div className="w-8 h-8 rounded-full bg-[#AE1F23]/20 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-[#C1121F]" />
                 </div>
                 <span className="text-gray-700">{benefit}</span>
               </motion.div>
@@ -205,10 +207,10 @@ const Signup = () => {
 
           <div className="mt-12 p-6 bg-white/50 backdrop-blur-lg rounded-2xl border border-white/50">
             <p className="text-gray-600 italic mb-4">
-              "SIMIT has transformed how we approach capacity planning. The Monte Carlo simulations give us confidence in our staffing decisions."
+              "PulseFlow has transformed how we approach capacity planning. The Monte Carlo simulations give us confidence in our staffing decisions."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0077b6] to-[#00b4d8] flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C1121F] to-[#AE1F23] flex items-center justify-center text-white font-bold">
                 JD
               </div>
               <div>
@@ -227,14 +229,14 @@ const Signup = () => {
         >
           {/* Mobile Logo */}
           <Link to="/" className="flex items-center justify-center gap-3 mb-8 md:hidden">
-            <img src={logoSp} alt="SIMIT Logo" className="w-14 h-14 rounded-2xl object-contain" />
-            <span className="text-3xl font-bold text-[#0077b6]">SIMIT</span>
+            <img src={logoSp} alt="PulseFlow Logo" className="w-14 h-14 rounded-2xl object-contain bg-white p-1.5 shadow-sm" />
+            <span className="text-3xl font-bold text-[#780000]">PulseFlow</span>
           </Link>
 
-          <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-[#003049]/10">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Account</h2>
-              <p className="text-gray-600">Get started with your free account</p>
+              <h2 className="text-2xl font-bold text-[#003049] mb-2">Create Staff Account</h2>
+              <p className="text-[#557283]">Enable access to PulseFlow simulation modules</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -253,7 +255,7 @@ const Signup = () => {
                     value={formData.fullName}
                     onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full pl-12 pr-4 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                     required
                   />
                 </div>
@@ -274,7 +276,7 @@ const Signup = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="you@example.com"
-                    className="w-full pl-12 pr-4 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                     required
                   />
                 </div>
@@ -295,7 +297,7 @@ const Signup = () => {
                     value={formData.organization}
                     onChange={handleChange}
                     placeholder="Hospital or organization name"
-                    className="w-full pl-12 pr-4 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                   />
                 </div>
               </div>
@@ -315,7 +317,7 @@ const Signup = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••"
-                    className="w-full pl-12 pr-12 py-3 bg-white/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00b4d8] focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-12 py-3 bg-white/70 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C1121F]/40 focus:border-[#C1121F] transition-all"
                     required
                   />
                   <button
@@ -339,14 +341,14 @@ const Signup = () => {
                   id="terms"
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="w-4 h-4 mt-1 text-[#0077b6] border-gray-300 rounded focus:ring-[#00b4d8]"
+                  className="w-4 h-4 mt-1 text-[#C1121F] border-gray-300 rounded focus:ring-[#C1121F]"
                   required
                 />
                 <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                   I agree to the{' '}
-                  <a href="#" className="text-[#0077b6] hover:underline">Terms of Service</a>
+                  <a href="#" className="text-[#780000] hover:underline">Terms of Service</a>
                   {' '}and{' '}
-                  <a href="#" className="text-[#0077b6] hover:underline">Privacy Policy</a>
+                  <a href="#" className="text-[#780000] hover:underline">Privacy Policy</a>
                 </label>
               </div>
 
@@ -356,7 +358,7 @@ const Signup = () => {
                 disabled={isLoading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] text-white rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#0077b6]/30 disabled:opacity-70"
+                className="w-full py-4 bg-gradient-to-r from-[#780000] to-[#C1121F] text-white rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#780000]/30 disabled:opacity-70"
               >
                 {isLoading ? (
                   <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -372,7 +374,7 @@ const Signup = () => {
             {/* Sign In Link */}
             <p className="text-center mt-6 text-gray-600">
               Already have an account?{' '}
-              <Link to="/login" className="text-[#0077b6] font-semibold hover:text-[#00b4d8] transition-colors">
+              <Link to="/login" className="text-[#780000] font-semibold hover:text-[#C1121F] transition-colors">
                 Sign in
               </Link>
             </p>

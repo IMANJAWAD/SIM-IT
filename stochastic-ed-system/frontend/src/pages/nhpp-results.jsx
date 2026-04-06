@@ -32,18 +32,22 @@ import {
 
 // Color palette
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
-  purple: '#8b5cf6',
-  pink: '#ec4899',
-  indigo: '#6366f1',
-  emerald: '#10b981',
-  orange: '#f97316',
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  accent: '#669BBC',
+  light: '#f5f8fb',
+  success: '#2a9d8f',
+  warning: '#669BBC',
+  danger: '#780000',
+  purple: '#003049',
+  pink: '#669BBC',
+  indigo: '#003049',
+  emerald: '#2a9d8f',
+  orange: '#780000',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
   white: '#ffffff',
 };
 
@@ -172,58 +176,48 @@ export default function NHPPResults() {
   }
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.light} 0%, #e0f7fa 100%)` }}>
+    <div className="min-h-screen pt-16" style={{ background: COLORS.light }}>
       <div className="py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-6 bg-white rounded-2xl border shadow-sm p-6 space-y-5" style={{ borderColor: COLORS.border }}>
           
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className=""
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <button
                       onClick={() => navigate('/poisson-process')}
-                      className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+                      className="p-2 rounded-xl transition-colors"
+                      style={{ background: `${COLORS.secondary}20` }}
                     >
-                      <ArrowLeft className="w-5 h-5 text-gray-600" />
+                      <ArrowLeft className="w-5 h-5" style={{ color: COLORS.textMuted }} />
                     </button>
-                    <div 
-                      className="p-3 rounded-2xl"
-                      style={{ background: `linear-gradient(135deg, ${COLORS.purple}, ${COLORS.pink})` }}
-                    >
-                      <Activity className="w-7 h-7 text-white" />
-                    </div>
-                    <span 
-                      className="px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: COLORS.accent, color: COLORS.purple }}
-                    >
+                    <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: COLORS.textMuted }}>
                       NHPP Simulation Results
                     </span>
                   </div>
-                  <h1 className="text-3xl lg:text-4xl font-bold mb-2 text-gray-800">
+                  <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: COLORS.textDark }}>
                     Emergency Department Analysis Results
                   </h1>
-                  <p className="text-gray-600 text-lg max-w-xl">
+                  <p className="text-lg max-w-xl" style={{ color: COLORS.textMuted }}>
                     Comprehensive NHPP simulation results with theoretical analysis and Monte Carlo validation
                   </p>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-sm text-gray-600">Peak Hour</div>
-                    <div className="text-2xl font-bold text-purple-800">{nhppResults.peak_hour}</div>
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>Peak Hour</div>
+                    <div className="text-2xl font-bold" style={{ color: COLORS.primary }}>{nhppResults.peak_hour}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-600">Peak Utilization</div>
-                    <div className={`text-2xl font-bold ${
-                      nhppResults.peak_utilization > 100 ? 'text-red-600' : 
-                      nhppResults.peak_utilization > 80 ? 'text-orange-600' : 'text-green-600'
-                    }`}>
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>Peak Utilization</div>
+                    <div className="text-2xl font-bold" style={{ color: nhppResults.peak_utilization > 100 ? COLORS.alertHint : nhppResults.peak_utilization > 80 ? COLORS.secondary : COLORS.success }}>
                       {nhppResults.peak_utilization}%
                     </div>
                   </div>
@@ -266,70 +260,68 @@ export default function NHPPResults() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-6"
+            className=""
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <div className="rounded-xl p-5 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-blue-100">
-                    <Users className="w-6 h-6 text-blue-600" />
+                  <div className="p-3 rounded-xl" style={{ background: `${COLORS.secondary}22` }}>
+                    <Users className="w-6 h-6" style={{ color: COLORS.primary }} />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600">Daily Patient Load</div>
-                    <div className="text-2xl font-bold text-gray-800">{nhppResults.daily_total}</div>
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>Daily Patient Load</div>
+                    <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{nhppResults.daily_total}</div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">Total patients expected</div>
+                <div className="text-xs" style={{ color: COLORS.textMuted }}>Total patients expected</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <div className="rounded-xl p-5 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-red-100">
-                    <AlertTriangle className="w-6 h-6 text-red-600" />
+                  <div className="p-3 rounded-xl" style={{ background: `${COLORS.alertHint}15` }}>
+                    <AlertTriangle className="w-6 h-6" style={{ color: COLORS.alertHint }} />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600">Critical Patients</div>
-                    <div className="text-2xl font-bold text-gray-800">{nhppResults.critical_patients}</div>
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>Critical Patients</div>
+                    <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{nhppResults.critical_patients}</div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">During peak hour</div>
+                <div className="text-xs" style={{ color: COLORS.textMuted }}>During peak hour</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <div className="rounded-xl p-5 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-orange-100">
-                    <Clock className="w-6 h-6 text-orange-600" />
+                  <div className="p-3 rounded-xl" style={{ background: `${COLORS.secondary}22` }}>
+                    <Clock className="w-6 h-6" style={{ color: COLORS.primary }} />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600">Max Wait Time</div>
-                    <div className="text-2xl font-bold text-gray-800">
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>Max Wait Time</div>
+                    <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
                       {Math.max(...(nhppResults.hourly_data?.map(h => h.theoretical_wait) || [0])).toFixed(1)}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">Minutes during peak</div>
+                <div className="text-xs" style={{ color: COLORS.textMuted }}>Minutes during peak</div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <div className="rounded-xl p-5 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-green-100">
-                    <Target className="w-6 h-6 text-green-600" />
+                  <div className="p-3 rounded-xl" style={{ background: `${COLORS.success}15` }}>
+                    <Target className="w-6 h-6" style={{ color: COLORS.success }} />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600">System Status</div>
-                    <div className={`text-2xl font-bold ${
-                      nhppResults.peak_utilization > 100 ? 'text-red-600' : 
-                      nhppResults.peak_utilization > 80 ? 'text-orange-600' : 'text-green-600'
-                    }`}>
+                    <div className="text-sm" style={{ color: COLORS.textMuted }}>System Status</div>
+                    <div className="text-2xl font-bold" style={{ color: nhppResults.peak_utilization > 100 ? COLORS.alertHint : nhppResults.peak_utilization > 80 ? COLORS.secondary : COLORS.success }}>
                       {nhppResults.peak_utilization > 100 ? 'Critical' : 
                        nhppResults.peak_utilization > 80 ? 'Warning' : 'Normal'}
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">Overall assessment</div>
+                <div className="text-xs" style={{ color: COLORS.textMuted }}>Overall assessment</div>
               </div>
             </div>
           </motion.div>
+          </div>
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
