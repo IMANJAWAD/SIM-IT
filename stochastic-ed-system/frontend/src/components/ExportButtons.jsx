@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { Download, FileText, Camera } from 'lucide-react';
 
-// STRICT COLORS ONLY: #caf0f8, #0077b6, #00b4d8, #f0f3bd
+// Results palette: Cosmos Blue and Blue Marble
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
+  primary: '#003049',
+  secondary: '#669BBC',
+  accent: '#669BBC',
+  light: '#f5f8fb',
 };
 
 export default function ExportButtons({ simulationData, onExportPDF, onExportCSV, onScreenshot }) {

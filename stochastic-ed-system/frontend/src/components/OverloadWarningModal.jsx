@@ -3,10 +3,10 @@ import { AlertTriangle, X, Play, Sliders } from 'lucide-react';
 
 // Color palette as specified
 const COLORS = {
-  bgLight: '#caf0f8',
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  bgLight: '#f5f8fb',
+  primary: '#C1121F',
+  secondary: '#AE1F23',
+  accent: '#669BBC',
   white: '#ffffff',
   textDark: '#1a365d',
   textMuted: '#4a5568',

@@ -35,16 +35,16 @@ const LOSDistributionByPriority = ({ data }) => {
         <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 40, bottom: 30 }}>
           <defs>
             <linearGradient id="colorCritical" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#0077b6" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#0077b6" stopOpacity={0.1}/>
+              <stop offset="5%" stopColor="#385a70" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#385a70" stopOpacity={0.1}/>
             </linearGradient>
             <linearGradient id="colorUrgent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#00b4d8" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#00b4d8" stopOpacity={0.1}/>
+              <stop offset="5%" stopColor="#5f7c8d" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#5f7c8d" stopOpacity={0.1}/>
             </linearGradient>
             <linearGradient id="colorNonUrgent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#caf0f8" stopOpacity={1}/>
-              <stop offset="95%" stopColor="#caf0f8" stopOpacity={0.3}/>
+              <stop offset="5%" stopColor="#d8e1e7" stopOpacity={1}/>
+              <stop offset="95%" stopColor="#d8e1e7" stopOpacity={0.3}/>
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -74,7 +74,7 @@ const LOSDistributionByPriority = ({ data }) => {
             type="monotone" 
             dataKey="critical" 
             name="Critical"
-            stroke="#0077b6" 
+            stroke="#385a70" 
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorCritical)" 
@@ -84,7 +84,7 @@ const LOSDistributionByPriority = ({ data }) => {
             type="monotone" 
             dataKey="urgent" 
             name="Urgent"
-            stroke="#00b4d8" 
+            stroke="#5f7c8d" 
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorUrgent)" 
@@ -95,7 +95,7 @@ const LOSDistributionByPriority = ({ data }) => {
             type="monotone" 
             dataKey="nonUrgent" 
             name="Non-Urgent"
-            stroke="#0077b6" 
+            stroke="#6f8695" 
             strokeWidth={1}
             strokeDasharray="4 2"
             fillOpacity={1}

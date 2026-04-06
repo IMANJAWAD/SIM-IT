@@ -10,12 +10,12 @@ import 'reactflow/dist/style.css';
 import { motion } from 'framer-motion';
 import { GitBranch } from 'lucide-react';
 
-// STRICT COLORS ONLY: #caf0f8, #0077b6, #00b4d8, #f0f3bd
+// Results palette: Cosmos Blue and Blue Marble
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
+  primary: '#003049',
+  secondary: '#669BBC',
+  accent: '#669BBC',
+  light: '#f5f8fb',
 };
 
 // Custom Node Component
@@ -31,11 +31,11 @@ function StateNode({ data }) {
       className="w-16 h-16 rounded-full flex flex-col items-center justify-center shadow-lg border-2 border-white"
       style={{
         background: isHighProb ? COLORS.primary : '#ffffff',
-        boxShadow: isHighProb ? '0 0 20px rgba(0, 180, 216, 0.5)' : '0 4px 15px rgba(0, 0, 0, 0.1)'
+        boxShadow: isHighProb ? '0 0 20px rgba(102, 155, 188, 0.55)' : '0 4px 15px rgba(0, 0, 0, 0.1)'
       }}
     >
       <Handle type="target" position={Position.Left} className="opacity-0" />
-      <span className={`text-lg font-bold ${isHighProb ? 'text-white' : 'text-[#0077b6]'}`}>
+      <span className={`text-lg font-bold ${isHighProb ? 'text-white' : 'text-[#003049]'}`}>
         {data.label}
       </span>
       <span style={{ color: isHighProb ? '#ffffff' : COLORS.primary }} className="text-xs font-medium">
@@ -68,10 +68,10 @@ export default function MarkovChainVisualization({ data }) {
       label: edge.probability.toFixed(3),
       type: 'smoothstep',
       animated: true,
-      style: { stroke: '#00b4d8', strokeWidth: 2 },
-      labelStyle: { fontSize: 10, fill: '#0077b6' },
+      style: { stroke: '#669BBC', strokeWidth: 2 },
+      labelStyle: { fontSize: 10, fill: '#003049' },
       labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#00b4d8' },
+      markerEnd: { type: MarkerType.ArrowClosed, color: '#669BBC' },
     }));
 
     return { nodes: diagramNodes, edges: diagramEdges };

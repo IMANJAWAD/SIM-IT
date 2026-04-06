@@ -29,18 +29,20 @@ import {
   ArrowRightLeft
 } from 'lucide-react';
 
-// Updated color palette to match theme
+// Landing-aligned palette for consistent look and feel
 const COLORS = {
-  bgLight: '#caf0f8',
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  bgLight: '#f5f8fb',
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  accent: '#669BBC',
   white: '#ffffff',
-  textDark: '#1a365d',
-  textMuted: '#4a5568',
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
+  success: '#2a9d8f',
+  warning: '#669BBC',
+  danger: '#780000',
 };
 
 // Custom Hospital Node Component
@@ -133,7 +135,7 @@ function HospitalNode({ data }) {
           </div>
           
           {isStable === false && (
-            <div className="flex items-center gap-1 text-xs text-red-600 mt-1">
+            <div className="flex items-center gap-1 text-xs mt-1" style={{ color: COLORS.alertHint }}>
               <AlertCircle className="w-3 h-3" />
               <span>Unstable! ρ ≥ 1.0</span>
             </div>
@@ -787,7 +789,7 @@ export default function JacksonNetwork() {
   const selectedDeptName = selectedNode ? departments[departmentIds.indexOf(selectedNode)] : '';
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.bgLight} 0%, #e0f7fa 100%)` }}>
+    <div className="min-h-screen pt-16" style={{ background: COLORS.bgLight }}>
       {/* Side Drawer Overlay */}
       <AnimatePresence>
         {isDrawerOpen && (
@@ -815,15 +817,6 @@ export default function JacksonNetwork() {
               {/* Drawer Header */}
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="p-3 rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                  >
-                    {selectedNode === 'triage' && <Stethoscope className="w-6 h-6 text-white" />}
-                    {selectedNode === 'er_minor' && <Bed className="w-6 h-6 text-white" />}
-                    {selectedNode === 'trauma' && <AlertTriangle className="w-6 h-6 text-white" />}
-                    {selectedNode === 'xray' && <Zap className="w-6 h-6 text-white" />}
-                  </div>
                   <div>
                     <h2 className="text-xl font-bold" style={{ color: COLORS.textDark }}>{selectedDeptName} Configuration</h2>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Adjust parameters and costs</p>
@@ -851,7 +844,7 @@ export default function JacksonNetwork() {
                     </label>
                     <span 
                       className="px-3 py-1 rounded-lg text-sm font-bold"
-                      style={{ background: COLORS.accent, color: COLORS.primary }}
+                      style={{ background: `${COLORS.accent}22`, color: COLORS.primary }}
                     >
                       {selectedConfig.serviceRate.toFixed(1)} /hr
                     </span>
@@ -877,7 +870,7 @@ export default function JacksonNetwork() {
                     </label>
                     <span 
                       className="px-3 py-1 rounded-lg text-sm font-bold"
-                      style={{ background: COLORS.accent, color: COLORS.primary }}
+                      style={{ background: `${COLORS.accent}22`, color: COLORS.primary }}
                     >
                       {selectedConfig.servers}
                     </span>
@@ -905,7 +898,7 @@ export default function JacksonNetwork() {
                     </label>
                     <span 
                       className="px-3 py-1 rounded-lg text-sm font-bold"
-                      style={{ background: COLORS.accent, color: COLORS.primary }}
+                      style={{ background: `${COLORS.accent}22`, color: COLORS.primary }}
                     >
                       ${selectedConfig.costPerHour.toFixed(0)}
                     </span>
@@ -918,7 +911,7 @@ export default function JacksonNetwork() {
                     value={selectedConfig.costPerHour}
                     onChange={(e) => updateNodeConfig(selectedNode, 'costPerHour', e.target.value)}
                     className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                    style={{ background: `linear-gradient(to right, ${COLORS.warning}, ${COLORS.danger})` }}
+                    style={{ background: `linear-gradient(to right, ${COLORS.secondary}, ${COLORS.alertHint})` }}
                   />
                   <p className="text-xs" style={{ color: COLORS.textMuted }}>Operating cost per server per hour</p>
                 </div>
@@ -940,7 +933,7 @@ export default function JacksonNetwork() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm" style={{ color: COLORS.textMuted }}>Utilization (ρ)</span>
-                      <span className={`font-bold ${selectedMetrics.rho >= 1 ? 'text-red-600' : ''}`}>
+                      <span className="font-bold" style={{ color: selectedMetrics.rho >= 1 ? COLORS.alertHint : COLORS.primary }}>
                         {selectedMetrics.rho.toFixed(3)}
                       </span>
                     </div>
@@ -1020,30 +1013,20 @@ export default function JacksonNetwork() {
       {/* Main Content */}
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-8 bg-white rounded-2xl border shadow-sm p-6 space-y-6" style={{ borderColor: COLORS.border }}>
           
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className=""
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div 
-                      className="p-3 rounded-2xl"
-                      style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                    >
-                      <Activity className="w-7 h-7 text-white" />
-                    </div>
-                    <span 
-                      className="px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: COLORS.accent, color: COLORS.primary }}
-                    >
-                      Jackson Network Configuration
-                    </span>
-                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: COLORS.textMuted }}>
+                    Jackson Network Configuration
+                  </p>
                   <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: COLORS.textDark }}>
                     Hospital Network Setup
                   </h1>
@@ -1058,7 +1041,7 @@ export default function JacksonNetwork() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="px-4 py-3 rounded-xl font-semibold flex items-center gap-2 border-2 transition-all"
-                    style={{ borderColor: COLORS.warning, color: COLORS.warning }}
+                    style={{ borderColor: COLORS.secondary, color: COLORS.primary }}
                   >
                     <RotateCcw className="w-4 h-4" />
                     Reset All
@@ -1066,8 +1049,8 @@ export default function JacksonNetwork() {
                   
                   {apiError && (
                     <div className="text-right">
-                      <p className="text-sm text-red-600">Simulation Note</p>
-                      <p className="text-xs text-red-500">Using local DES</p>
+                      <p className="text-sm" style={{ color: COLORS.alertHint }}>Simulation Note</p>
+                      <p className="text-xs" style={{ color: COLORS.alertHint }}>Using local DES</p>
                     </div>
                   )}
                   
@@ -1080,7 +1063,7 @@ export default function JacksonNetwork() {
                     style={{ 
                       background: isLoading 
                         ? `linear-gradient(135deg, #6b7280, #9ca3af)` 
-                        : `linear-gradient(135deg, ${COLORS.success}, #059669)`,
+                        : `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
                       cursor: isLoading ? 'not-allowed' : 'pointer'
                     }}
                   >
@@ -1110,23 +1093,24 @@ export default function JacksonNetwork() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4"
+              className=""
             >
-              <div className="bg-white rounded-2xl p-4 shadow-lg">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="rounded-xl p-3" style={{ background: `${COLORS.secondary}10`, border: `1px solid ${COLORS.border}` }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm" style={{ color: COLORS.textMuted }}>System Status</span>
                   {networkMetrics.systemStable ? (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <CheckCircle className="w-5 h-5" style={{ color: COLORS.success }} />
                   ) : (
-                    <AlertCircle className="w-5 h-5 text-red-600" />
+                    <AlertCircle className="w-5 h-5" style={{ color: COLORS.alertHint }} />
                   )}
                 </div>
-                <p className={`text-2xl font-bold ${networkMetrics.systemStable ? 'text-green-600' : 'text-red-600'}`}>
+                <p className="text-2xl font-bold" style={{ color: networkMetrics.systemStable ? COLORS.success : COLORS.alertHint }}>
                   {networkMetrics.systemStable ? 'Stable' : 'Unstable'}
                 </p>
               </div>
               
-              <div className="bg-white rounded-2xl p-4 shadow-lg">
+              <div className="rounded-xl p-3" style={{ background: `${COLORS.secondary}10`, border: `1px solid ${COLORS.border}` }}>
                 <div className="flex items-center gap-2 mb-2">
                   <ArrowRightLeft className="w-5 h-5" style={{ color: COLORS.primary }} />
                   <span className="text-sm" style={{ color: COLORS.textMuted }}>Throughput</span>
@@ -1136,7 +1120,7 @@ export default function JacksonNetwork() {
                 </p>
               </div>
               
-              <div className="bg-white rounded-2xl p-4 shadow-lg">
+              <div className="rounded-xl p-3" style={{ background: `${COLORS.secondary}10`, border: `1px solid ${COLORS.border}` }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5" style={{ color: COLORS.primary }} />
                   <span className="text-sm" style={{ color: COLORS.textMuted }}>Total Patients</span>
@@ -1146,7 +1130,7 @@ export default function JacksonNetwork() {
                 </p>
               </div>
               
-              <div className="bg-white rounded-2xl p-4 shadow-lg">
+              <div className="rounded-xl p-3" style={{ background: `${COLORS.secondary}10`, border: `1px solid ${COLORS.border}` }}>
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5" style={{ color: COLORS.primary }} />
                   <span className="text-sm" style={{ color: COLORS.textMuted }}>Total Cost/hr</span>
@@ -1154,6 +1138,7 @@ export default function JacksonNetwork() {
                 <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
                   ${networkMetrics.totalCost.toFixed(0)}
                 </p>
+              </div>
               </div>
             </motion.div>
           )}
@@ -1163,12 +1148,9 @@ export default function JacksonNetwork() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-8 bg-white rounded-3xl shadow-lg border border-gray-100 p-6"
+            className="p-1"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl" style={{ background: `${COLORS.primary}20` }}>
-                <Users className="w-5 h-5" style={{ color: COLORS.primary }} />
-              </div>
               <h3 className="text-lg font-bold" style={{ color: COLORS.textDark }}>External Arrival Rate</h3>
             </div>
             <div className="flex items-center gap-6">
@@ -1193,20 +1175,21 @@ export default function JacksonNetwork() {
             </div>
             <p className="text-xs mt-2" style={{ color: COLORS.textMuted }}>All patients arrive at Triage department (Poisson process)</p>
           </motion.div>
+          </div>
 
           {/* Network Visualization */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-8 bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
-            style={{ height: '600px' }}
+            className="mb-8 bg-white rounded-2xl shadow-sm border overflow-hidden"
+            style={{ borderColor: COLORS.border, height: '600px' }}
           >
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-6 border-b" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>Network Visualization</h2>
-                  <p className="text-gray-600">Click on nodes to configure department parameters</p>
+                  <p style={{ color: COLORS.textMuted }}>Click on nodes to configure department parameters</p>
                 </div>
                 <div className="flex items-center gap-4 text-xs">
                   <div className="flex items-center gap-1">
@@ -1236,13 +1219,14 @@ export default function JacksonNetwork() {
                 proOptions={{ hideAttribution: true }}
               >
                 <Background 
-                  color="#e5e7eb" 
+                  color={COLORS.border}
                   gap={20} 
                   size={1}
-                  style={{ backgroundColor: '#f9fafb' }}
+                  style={{ backgroundColor: '#f7fbff' }}
                 />
                 <Controls 
-                  className="bg-white rounded-lg shadow-lg border border-gray-200"
+                  className="bg-white rounded-lg shadow-lg border"
+                  style={{ borderColor: COLORS.border }}
                 />
               </ReactFlow>
             </div>
@@ -1253,20 +1237,15 @@ export default function JacksonNetwork() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
+            className="bg-white rounded-2xl shadow-sm border overflow-hidden"
+            style={{ borderColor: COLORS.border }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="p-3 rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                  >
-                    <Grid3X3 className="w-6 h-6 text-white" />
-                  </div>
                   <div>
                     <h2 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>Routing Matrix Editor</h2>
-                    <p className="text-gray-600">Configure patient flow probabilities between departments</p>
+                    <p style={{ color: COLORS.textMuted }}>Configure patient flow probabilities between departments</p>
                   </div>
                 </div>
                 <motion.button
@@ -1319,8 +1298,9 @@ export default function JacksonNetwork() {
                                 className={`w-full p-2 text-center rounded-lg border-2 font-medium transition-all ${
                                   sourceIndex === targetIndex 
                                     ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
-                                    : 'border-gray-200 focus:border-blue-400 focus:outline-none'
+                                      : 'border-gray-200 focus:outline-none'
                                 }`}
+                                  style={sourceIndex === targetIndex ? {} : { outlineColor: COLORS.secondary }}
                                 disabled={sourceIndex === targetIndex}
                                 placeholder="0.00"
                               />

@@ -28,13 +28,17 @@ const TRIAGE_COLORS = {
   level3: '#d97706', // Yellow - Urgent
   level4: '#16a34a', // Green - Less Urgent
   level5: '#2563eb', // Blue - Non-Urgent
-  background: '#caf0f8',
+  background: '#edf4fa',
   white: '#ffffff',
 };
 
 const UI_COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
 };
 
 // Predefined scenarios for triage distribution
@@ -430,41 +434,33 @@ export default function PriorityQueuing() {
     </div>
   );
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${TRIAGE_COLORS.background} 0%, #e0f7fa 100%)` }}>
+    <div className="min-h-screen pt-16" style={{ background: TRIAGE_COLORS.background }}>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-8 bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: UI_COLORS.border }}>
           
           {/* Header: Triage Setup */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-6"
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="text-center">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div 
-                    className="p-4 rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }}
-                  >
-                    <Activity className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <h1 className="text-4xl font-bold mb-3 text-gray-800">
+                <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: UI_COLORS.textMuted }}>
+                  Priority Queuing Configuration
+                </p>
+                <h1 className="text-4xl font-bold mb-3" style={{ color: UI_COLORS.textDark }}>
                   Triage Setup
                 </h1>
-                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                <p className="text-lg max-w-2xl mx-auto" style={{ color: UI_COLORS.textMuted }}>
                   Configure emergency department priority queuing system with mathematical precision
                 </p>
                 <div className="mt-4 flex items-center justify-center gap-4">
-                  <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                  <span className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: `${UI_COLORS.secondary}20`, color: UI_COLORS.primary }}>
                     M/M/c Priority Queue
                   </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    preemptionEnabled 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-orange-100 text-orange-800'
-                  }`}>
+                  <span className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: preemptionEnabled ? '#d9f2ed' : `${UI_COLORS.alertHint}12`, color: preemptionEnabled ? '#1d7f73' : UI_COLORS.alertHint }}>
                     {preemptionEnabled ? 'Preemptive' : 'Non-Preemptive'} Service
                   </span>
                 </div>
@@ -476,16 +472,16 @@ export default function PriorityQueuing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-8"
+            className="mb-0"
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="rounded-2xl p-6 border" style={{ borderColor: UI_COLORS.border }}>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <TrendingUp className="w-6 h-6 text-[#0077b6]" />
+                  <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                    <TrendingUp className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                     Section 1: Population Distribution
                   </h2>
-                  <p className="text-gray-600 mt-1">
+                  <p className="mt-1" style={{ color: UI_COLORS.textMuted }}>
                     Configure arrival rates (λᵢ) for each triage priority level
                   </p>
                 </div>
@@ -592,11 +588,11 @@ export default function PriorityQueuing() {
                 </div>
               </div>
               {/* Waiting Room Preview */}
-              <div className="p-4 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border-2 border-gray-200">
+              <div className="p-4 rounded-xl border" style={{ background: `${UI_COLORS.secondary}10`, borderColor: UI_COLORS.border }}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <div className="font-semibold text-gray-800 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#0077b6]" />
+                      <Users className="w-4 h-4" style={{ color: UI_COLORS.primary }} />
                       Waiting Room Preview
                     </div>
                     <div className="text-sm text-gray-600">Live visualization of patient distribution</div>
@@ -634,13 +630,13 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  <Settings className="w-6 h-6 text-[#0077b6]" />
+                  <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                    <Settings className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                   Section 2: Priority Details Grid
                 </h2>
-                <p className="text-gray-600 mt-1">
+                  <p className="mt-1" style={{ color: UI_COLORS.textMuted }}>
                   Configure service rates (μᵢ) and clinical parameters for each priority level
                 </p>
               </div>
@@ -747,13 +743,13 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.3 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  <Shield className="w-6 h-6 text-[#0077b6]" />
+                  <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: UI_COLORS.textDark }}>
+                    <Shield className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                   Section 3: Logic Settings
                 </h2>
-                <p className="text-gray-600 mt-1">
+                  <p className="mt-1" style={{ color: UI_COLORS.textMuted }}>
                   Configure queueing discipline and system behavior parameters
                 </p>
               </div>
@@ -899,7 +895,7 @@ export default function PriorityQueuing() {
             transition={{ delay: 0.4 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
               <div className="text-center">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                   <motion.button
@@ -909,9 +905,10 @@ export default function PriorityQueuing() {
                     disabled={!isValidDistribution}
                     className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
                       isValidDistribution
-                        ? 'bg-gradient-to-r from-[#0077b6] to-[#00b4d8] text-white shadow-lg hover:shadow-xl'
+                        ? 'text-white shadow-lg hover:shadow-xl'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
+                      style={isValidDistribution ? { background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` } : {}}
                   >
                     <div className="flex items-center gap-3">
                       <Settings className="w-6 h-6" />
@@ -927,10 +924,11 @@ export default function PriorityQueuing() {
                     className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
                       isValidDistribution
                         ? isSimulationRunning
-                          ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg hover:shadow-xl'
-                          : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg hover:shadow-xl'
+                          ? 'text-white shadow-lg hover:shadow-xl'
+                          : 'text-white shadow-lg hover:shadow-xl'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
+                    style={isValidDistribution ? (isSimulationRunning ? { background: `linear-gradient(135deg, ${UI_COLORS.alertHint}, #9e1f1f)` } : { background: `linear-gradient(135deg, ${UI_COLORS.primary}, ${UI_COLORS.secondary})` }) : {}}
                   >
                     <div className="flex items-center gap-3">
                       {isSimulationRunning ? (
@@ -998,9 +996,9 @@ export default function PriorityQueuing() {
               transition={{ delay: 0.5 }}
               className="mb-8"
             >
-              <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
                 <h3 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-                  <Activity className="w-6 h-6 text-green-600" />
+                  <Activity className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
                   {preemptionEnabled ? 'Preemptive' : 'Non-Preemptive'} Priority Queue Simulation Active
                 </h3>
                 
@@ -1087,6 +1085,7 @@ export default function PriorityQueuing() {
               </div>
             </motion.div>
           )}
+          </div>
 
         </div>
       </div>

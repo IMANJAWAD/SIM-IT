@@ -36,20 +36,22 @@ import {
   Legend
 } from 'recharts';
 
-// Updated color palette to match theme
+// Simplified, consistent palette
 const COLORS = {
-  bgLight: '#caf0f8',
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  bgLight: '#f5f8fb',
+  primary: '#003049',
+  secondary: '#669BBC',
+  alertHint: '#780000',
+  accent: '#669BBC',
   white: '#ffffff',
-  textDark: '#1a365d',
-  textMuted: '#4a5568',
-  success: '#10b981',
-  warning: '#f59e0b',
-  danger: '#ef4444',
-  emerald: '#10b981',
-  orange: '#f97316',
+  textDark: '#003049',
+  textMuted: '#557283',
+  border: '#c7dceb',
+  success: '#2a9d8f',
+  warning: '#669BBC',
+  danger: '#780000',
+  emerald: '#2a9d8f',
+  orange: '#780000',
 };
 
 // Enhanced Real-World ED Scenarios
@@ -545,33 +547,23 @@ export default function NonHomogeneousPoissonProcess() {
   }, [nhppResults]);
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: `linear-gradient(180deg, ${COLORS.bgLight} 0%, #e0f7fa 100%)` }}>
+    <div className="min-h-screen pt-16" style={{ background: COLORS.bgLight }}>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-8 bg-white rounded-2xl border shadow-sm p-6 space-y-6" style={{ borderColor: COLORS.border }}>
           
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className=""
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div 
-                      className="p-3 rounded-2xl"
-                      style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-                    >
-                      <Clock className="w-7 h-7 text-white" />
-                    </div>
-                    <span 
-                      className="px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: COLORS.accent, color: COLORS.primary }}
-                    >
-                      Non-Homogeneous Poisson Process
-                    </span>
-                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: COLORS.textMuted }}>
+                    Non-Homogeneous Poisson Process
+                  </p>
                   <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: COLORS.textDark }}>
                     Professional ED Arrival Scheduler
                   </h1>
@@ -585,8 +577,8 @@ export default function NonHomogeneousPoissonProcess() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={resetProfile}
-                    className="px-4 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg"
-                    style={{ background: COLORS.accent, color: COLORS.primary }}
+                    className="px-4 py-3 rounded-xl font-semibold flex items-center gap-2 border-2"
+                    style={{ borderColor: COLORS.secondary, color: COLORS.primary }}
                   >
                     <RotateCcw className="w-5 h-5" />
                     Reset
@@ -600,7 +592,7 @@ export default function NonHomogeneousPoissonProcess() {
                     style={{ 
                       background: isLoading 
                         ? `linear-gradient(135deg, #6b7280, #9ca3af)` 
-                        : `linear-gradient(135deg, ${COLORS.success}, ${COLORS.emerald})`,
+                        : `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
                       cursor: isLoading ? 'not-allowed' : 'pointer'
                     }}
                   >
@@ -626,15 +618,12 @@ export default function NonHomogeneousPoissonProcess() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-8"
+            className=""
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="p-1">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: COLORS.textDark }}>
-                    <Zap className="w-6 h-6" style={{ color: COLORS.orange }} />
-                    Real-World ED Scenarios
-                  </h2>
+                  <h2 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>Real-World ED Scenarios</h2>
                   <p className="mt-1" style={{ color: COLORS.textMuted }}>
                     Professional emergency department simulation scenarios based on actual healthcare patterns
                   </p>
@@ -651,11 +640,12 @@ export default function NonHomogeneousPoissonProcess() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => applyPreset(key)}
-                    className={`p-5 rounded-xl border-2 transition-all text-left ${
-                      selectedPreset === key
-                        ? 'border-blue-500 bg-blue-50 shadow-lg'
-                        : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
-                    }`}
+                    className="p-5 rounded-xl border-2 transition-all text-left bg-white"
+                    style={{
+                      borderColor: selectedPreset === key ? COLORS.secondary : COLORS.border,
+                      background: selectedPreset === key ? `${COLORS.secondary}12` : COLORS.white,
+                      boxShadow: selectedPreset === key ? `0 4px 14px -8px ${COLORS.secondary}` : 'none'
+                    }}
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-3xl">{preset.name.split(' ')[0]}</span>
@@ -713,6 +703,7 @@ export default function NonHomogeneousPoissonProcess() {
               </div>
             </div>
           </motion.div>
+          </div>
 
           {/* Chart with Shift Indicators */}
           <motion.div
@@ -1036,238 +1027,86 @@ export default function NonHomogeneousPoissonProcess() {
             transition={{ delay: 0.3 }}
             className="mb-8"
           >
-            <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2" style={{ color: COLORS.textDark }}>
-                <Activity className="w-6 h-6" style={{ color: COLORS.primary }} />
-                Department Impact Live Statistics
-              </h2>
-              
-              {/* Primary ED Metrics */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: COLORS.border }}>
+              <header className="mb-6">
+                <h2 className="text-2xl font-bold mb-1" style={{ color: COLORS.textDark }}>Department Impact Statistics</h2>
+                <p className="text-sm" style={{ color: COLORS.textMuted }}>Operational snapshot for triage, staffing, and service pressure.</p>
+              </header>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-4 rounded-xl border" style={{ background: `${COLORS.bgLight}50`, borderColor: COLORS.primary }}>
-                  <div className="text-sm mb-1" style={{ color: COLORS.primary }}>📊 Daily Patient Load</div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.totalDaily}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>total patients</div>
-                </div>
-                
-                <div className="text-center p-4 rounded-xl border" style={{ background: `${COLORS.bgLight}50`, borderColor: COLORS.success }}>
-                  <div className="text-sm mb-1" style={{ color: COLORS.success }}>⏱️ Average Hourly Rate</div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.avgHourly}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>patients/hour</div>
-                </div>
-                
-                <div className={`text-center p-4 rounded-xl border-2 ${
-                  edMetrics.isOverCapacity 
-                    ? 'border-red-200' 
-                    : 'border-orange-200'
-                }`} style={{ background: `${edMetrics.isOverCapacity ? '#fee2e2' : '#fff7ed'}50` }}>
-                  <div className={`text-sm mb-1 ${edMetrics.isOverCapacity ? 'text-red-600' : 'text-orange-600'}`}>
-                    🚨 Peak Crisis Hour
-                  </div>
-                  <div className={`text-2xl font-bold ${edMetrics.isOverCapacity ? 'text-red-800' : 'text-orange-800'}`}>
-                    {edMetrics.peakHour.toString().padStart(2, '0')}:00
-                  </div>
-                  <div className={`text-xs ${edMetrics.isOverCapacity ? 'text-red-600' : 'text-orange-600'}`}>
-                    {edMetrics.peakLoad} arrivals
-                    {edMetrics.isOverCapacity && ' 🚨'}
-                  </div>
-                </div>
-                
-                <div className="text-center p-4 rounded-xl border" style={{ background: `${COLORS.bgLight}50`, borderColor: COLORS.secondary }}>
-                  <div className="text-sm mb-1" style={{ color: COLORS.secondary }}>🏥 Capacity Usage</div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.capacityUtilization}%
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>
-                    of {SYSTEM_CAPACITY.maxCapacity} pts/hr max
-                  </div>
-                </div>
+                <article className="rounded-xl p-4 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>Daily Patient Load</p>
+                  <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{edMetrics.totalDaily}</p>
+                  <p className="text-xs" style={{ color: COLORS.textMuted }}>total patients</p>
+                </article>
+                <article className="rounded-xl p-4 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>Average Hourly Rate</p>
+                  <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{edMetrics.avgHourly}</p>
+                  <p className="text-xs" style={{ color: COLORS.textMuted }}>patients/hour</p>
+                </article>
+                <article className="rounded-xl p-4 border" style={{ borderColor: edMetrics.isOverCapacity ? COLORS.alertHint : COLORS.border, background: edMetrics.isOverCapacity ? `${COLORS.alertHint}10` : `${COLORS.secondary}10` }}>
+                  <p className="text-sm" style={{ color: edMetrics.isOverCapacity ? COLORS.alertHint : COLORS.textMuted }}>Peak Hour</p>
+                  <p className="text-2xl font-bold" style={{ color: edMetrics.isOverCapacity ? COLORS.alertHint : COLORS.textDark }}>{edMetrics.peakHour.toString().padStart(2, '0')}:00</p>
+                  <p className="text-xs" style={{ color: edMetrics.isOverCapacity ? COLORS.alertHint : COLORS.textMuted }}>{edMetrics.peakLoad} arrivals</p>
+                </article>
+                <article className="rounded-xl p-4 border" style={{ borderColor: COLORS.border, background: `${COLORS.secondary}10` }}>
+                  <p className="text-sm" style={{ color: COLORS.textMuted }}>Capacity Usage</p>
+                  <p className="text-2xl font-bold" style={{ color: COLORS.textDark }}>{edMetrics.capacityUtilization}%</p>
+                  <p className="text-xs" style={{ color: COLORS.textMuted }}>of {SYSTEM_CAPACITY.maxCapacity} pts/hr max</p>
+                </article>
               </div>
 
-              {/* ED-Specific Impact Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.accent}30`, borderColor: COLORS.warning }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🏃‍♂️</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Predicted Triage Load</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1" style={{ color: COLORS.textDark }}>
-                    {edMetrics.triageLoad}
-                  </div>
-                  <div className="text-sm" style={{ color: COLORS.textMuted }}>
-                    patients waiting in first hour
-                  </div>
-                  <div className="text-xs mt-2 italic" style={{ color: COLORS.textMuted }}>
-                    Based on 80% immediate triage processing rate
-                  </div>
-                </div>
-                
-                <div className="p-4 rounded-xl border" style={{ background: '#fee2e250', borderColor: COLORS.danger }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🚑</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Critical Care Need</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1" style={{ color: COLORS.textDark }}>
-                    {edMetrics.criticalCareNeed}
-                  </div>
-                  <div className="text-sm" style={{ color: COLORS.textMuted }}>
-                    critical patients during peak
-                  </div>
-                  <div className="text-xs mt-2 italic" style={{ color: COLORS.textMuted }}>
-                    15% of peak arrivals require critical care
-                  </div>
-                </div>
-                
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.bgLight}50`, borderColor: COLORS.primary }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🛏️</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Bed Turnover Rate</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1" style={{ color: COLORS.textDark }}>
-                    {edMetrics.bedTurnoverRate}
-                  </div>
-                  <div className="text-sm" style={{ color: COLORS.textMuted }}>
-                    beds/hour during peak
-                  </div>
-                  <div className="text-xs mt-2 italic" style={{ color: COLORS.textMuted }}>
-                    Required to handle peak load
-                  </div>
-                </div>
-              </div>
-
-              {/* Advanced ED Operations Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.success}10`, borderColor: COLORS.success }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">👩‍⚕️</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Nurses Required</span>
-                  </div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.nursesRequired}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>
-                    1:4 nurse-to-patient ratio
-                  </div>
-                </div>
-                
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.warning}10`, borderColor: COLORS.warning }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🚨</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Ambulance Diversions</span>
-                  </div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.ambulanceDiversions}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>
-                    expected during peak
-                  </div>
-                </div>
-                
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.secondary}10`, borderColor: COLORS.secondary }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">⏰</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Avg Wait Time</span>
-                  </div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.avgWaitTime}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>
-                    minutes during peak
-                  </div>
-                </div>
-                
-                <div className="p-4 rounded-xl border" style={{ background: `${COLORS.danger}10`, borderColor: COLORS.danger }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🚪</span>
-                    <span className="font-semibold" style={{ color: COLORS.textDark }}>Left w/o Treatment</span>
-                  </div>
-                  <div className="text-2xl font-bold" style={{ color: COLORS.textDark }}>
-                    {edMetrics.leftWithoutTreatment}
-                  </div>
-                  <div className="text-xs" style={{ color: COLORS.textMuted }}>
-                    patients (LWOT rate)
-                  </div>
-                </div>
-              </div>
-
-              {/* Clinical Impact Analysis */}
-              <div className="mt-6 p-5 rounded-xl border" style={{ background: `${COLORS.bgLight}30`, borderColor: COLORS.bgLight }}>
-                <h3 className="font-bold mb-3 flex items-center gap-2" style={{ color: COLORS.textDark }}>
-                  🏥 Clinical Impact Analysis
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="rounded-xl border p-4 mb-6" style={{ borderColor: COLORS.border }}>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <div className="font-semibold mb-2" style={{ color: COLORS.textDark }}>Triage Operations:</div>
-                    <ul className="space-y-1" style={{ color: COLORS.textMuted }}>
-                      <li>• Peak triage load: {edMetrics.triageLoad} patients waiting</li>
-                      <li>• Triage nurses needed: {Math.ceil(edMetrics.triageLoad / 10)}</li>
-                      <li>• Fast-track eligible: ~{Math.round(edMetrics.peakLoad * 0.4)} patients</li>
-                      <li>• ESI Level 1-2: {edMetrics.criticalCareNeed} critical cases</li>
-                    </ul>
+                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Triage Load</p>
+                    <p className="text-xl font-semibold" style={{ color: COLORS.textDark }}>{edMetrics.triageLoad}</p>
                   </div>
                   <div>
-                    <div className="font-semibold mb-2" style={{ color: COLORS.textDark }}>Resource Management:</div>
-                    <ul className="space-y-1" style={{ color: COLORS.textMuted }}>
-                      <li>• Bed turnover: {edMetrics.bedTurnoverRate} beds/hour required</li>
-                      <li>• Total nursing staff: {edMetrics.nursesRequired} nurses</li>
-                      <li>• Physician coverage: {Math.ceil(edMetrics.peakLoad / 8)} doctors</li>
-                      <li>• Support staff: {Math.ceil(edMetrics.peakLoad / 12)} techs</li>
-                    </ul>
+                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Critical Care Need</p>
+                    <p className="text-xl font-semibold" style={{ color: COLORS.textDark }}>{edMetrics.criticalCareNeed}</p>
                   </div>
                   <div>
-                    <div className="font-semibold mb-2" style={{ color: COLORS.textDark }}>Quality Indicators:</div>
-                    <ul className="space-y-1" style={{ color: COLORS.textMuted }}>
-                      <li>• Door-to-provider: {edMetrics.avgWaitTime} minutes</li>
-                      <li>• LWOT rate: {Math.round((edMetrics.leftWithoutTreatment / edMetrics.peakLoad) * 100)}%</li>
-                      <li>• Ambulance diversions: {edMetrics.ambulanceDiversions} expected</li>
-                      <li>• Patient satisfaction: {edMetrics.isOverCapacity ? 'At Risk' : 'Maintained'}</li>
-                    </ul>
+                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Bed Turnover</p>
+                    <p className="text-xl font-semibold" style={{ color: COLORS.textDark }}>{edMetrics.bedTurnoverRate}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Nurses Required</p>
+                    <p className="text-xl font-semibold" style={{ color: COLORS.textDark }}>{edMetrics.nursesRequired}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Real-time Recommendations */}
+              <div className="rounded-xl border p-4" style={{ borderColor: COLORS.border, background: `${COLORS.bgLight}40` }}>
+                <h3 className="font-semibold mb-3" style={{ color: COLORS.textDark }}>Clinical Impact Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" style={{ color: COLORS.textMuted }}>
+                  <div>
+                    <p>Triage nurses needed: {Math.ceil(edMetrics.triageLoad / 10)}</p>
+                    <p>Fast-track eligible: ~{Math.round(edMetrics.peakLoad * 0.4)} patients</p>
+                  </div>
+                  <div>
+                    <p>Physician coverage: {Math.ceil(edMetrics.peakLoad / 8)} doctors</p>
+                    <p>Support staff: {Math.ceil(edMetrics.peakLoad / 12)} techs</p>
+                  </div>
+                  <div>
+                    <p>Door-to-provider: {edMetrics.avgWaitTime} minutes</p>
+                    <p>LWOT rate: {Math.round((edMetrics.leftWithoutTreatment / edMetrics.peakLoad) * 100)}%</p>
+                  </div>
+                </div>
+              </div>
+
               {edMetrics.isOverCapacity && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mt-6 p-5 rounded-xl border-2" style={{ background: '#fee2e2', borderColor: COLORS.danger }}
-                >
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="w-6 h-6 text-red-600 mt-0.5" />
+                <aside className="mt-6 rounded-xl border p-4" style={{ borderColor: COLORS.alertHint, background: `${COLORS.alertHint}10` }}>
+                  <div className="flex items-start gap-2" style={{ color: COLORS.alertHint }}>
+                    <AlertTriangle className="w-5 h-5 mt-0.5" />
                     <div>
-                      <div className="font-bold text-red-800 text-lg mb-2">
-                        🚨 Immediate Action Required - Capacity Exceeded
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <div className="font-semibold text-red-800 mb-2">Immediate Actions:</div>
-                          <ul className="text-red-700 space-y-1">
-                            <li>• Activate surge capacity protocols</li>
-                            <li>• Call in {Math.ceil((edMetrics.peakLoad - SYSTEM_CAPACITY.maxCapacity) / 15)} additional staff</li>
-                            <li>• Open overflow areas/hallway beds</li>
-                            <li>• Implement ambulance diversion if needed</li>
-                          </ul>
-                        </div>
-                        <div>
-                          <div className="font-semibold text-red-800 mb-2">Quality Mitigation:</div>
-                          <ul className="text-red-700 space-y-1">
-                            <li>• Expedite discharge planning</li>
-                            <li>• Activate rapid assessment unit</li>
-                            <li>• Consider external transfers</li>
-                            <li>• Enhance communication with patients</li>
-                          </ul>
-                        </div>
-                      </div>
+                      <p className="font-semibold">Capacity Exceeded</p>
+                      <p className="text-sm">Activate surge capacity and add {Math.ceil((edMetrics.peakLoad - SYSTEM_CAPACITY.maxCapacity) / 15)} staff for peak windows.</p>
                     </div>
                   </div>
-                </motion.div>
+                </aside>
               )}
-            </div>
+            </section>
           </motion.div>
 
           {/* API Error Display */}

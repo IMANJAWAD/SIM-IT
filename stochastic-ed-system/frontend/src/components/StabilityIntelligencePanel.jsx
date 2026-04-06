@@ -5,10 +5,10 @@ import StabilityGauge from './StabilityGauge';
 
 // Color palette - vibrant status colors
 const COLORS = {
-  bgLight: '#caf0f8',
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
+  bgLight: '#f5f8fb',
+  primary: '#C1121F',
+  secondary: '#AE1F23',
+  accent: '#669BBC',
   white: '#ffffff',
   textDark: '#1a365d',
   textMuted: '#4a5568',
@@ -95,12 +95,6 @@ export default function StabilityIntelligencePanel({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-            >
-              <Activity className="w-5 h-5 text-white" />
-            </div>
             <div>
               <h2 className="text-lg font-semibold" style={{ color: COLORS.textDark }}>
                 Live Stability Intelligence

@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
-import { Scale, CheckCircle, XCircle, TrendingUp, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
-// STRICT COLORS ONLY: #caf0f8, #0077b6, #00b4d8, #f0f3bd
+// Muted colors for post-simulation results page
 const COLORS = {
-  primary: '#0077b6',
-  secondary: '#00b4d8',
-  accent: '#f0f3bd',
-  light: '#caf0f8',
-  textDark: '#1a365d',
+  primary: '#003049',
+  secondary: '#669BBC',
+  accent: '#d9e8f2',
+  alertHint: '#780000',
+  light: '#f5f8fb',
+  textDark: '#2d3748',
 };
 
 export default function ComparisonSection({ theoreticalData, simulatedData, longTermData }) {
@@ -18,13 +19,7 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
       >
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
-          <div 
-            className="p-2 rounded-xl"
-            style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-          >
-            <Scale className="w-5 h-5 text-white" />
-          </div>
+        <div className="px-5 py-4 border-b border-gray-100 bg-white">
           <h2 className="text-base font-semibold" style={{ color: COLORS.textDark }}>Theoretical vs Simulation Comparison</h2>
         </div>
         <p className="text-gray-400 text-center py-12 font-medium">Run simulation to compare results</p>
@@ -38,21 +33,18 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
       theoretical: theoreticalData?.expected_waiting_time,
       simulated: simulatedData?.expected_waiting_time || simulatedData?.avg_waiting_time,
       unit: 'min',
-      icon: TrendingUp,
     },
     {
       label: 'Utilization',
       theoretical: theoreticalData?.utilization,
       simulated: simulatedData?.utilization || simulatedData?.doctor_utilization,
       unit: '%',
-      icon: Scale,
     },
     {
       label: 'Probability of Delay',
       theoretical: theoreticalData?.probability_of_delay,
       simulated: longTermData?.steady_state_probabilities?.waiting_required,
       unit: '%',
-      icon: AlertTriangle,
     },
   ];
 
@@ -63,13 +55,7 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
       className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
-        <div 
-          className="p-2 rounded-xl"
-          style={{ background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` }}
-        >
-          <Scale className="w-5 h-5 text-white" />
-        </div>
+      <div className="px-5 py-4 border-b border-gray-100 bg-white">
         <h2 className="text-base font-semibold" style={{ color: COLORS.textDark }}>Theoretical vs Simulation Comparison</h2>
       </div>
 
@@ -79,19 +65,19 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
           <div 
             className="p-4 rounded-xl mb-6 border"
             style={{ 
-              backgroundColor: longTermData.stability_analysis.is_stable ? '#f0fdf4' : '#fef2f2',
-              borderColor: longTermData.stability_analysis.is_stable ? '#bbf7d0' : '#fecaca'
+              backgroundColor: longTermData.stability_analysis.is_stable ? '#edf7ff' : `${COLORS.alertHint}14`,
+              borderColor: longTermData.stability_analysis.is_stable ? '#b9d8ec' : `${COLORS.alertHint}33`
             }}
           >
             <div className="flex items-center gap-2 mb-2">
               {longTermData.stability_analysis.is_stable ? (
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5" style={{ color: COLORS.secondary }} />
               ) : (
-                <XCircle className="w-5 h-5 text-red-500" />
+                <XCircle className="w-5 h-5" style={{ color: COLORS.alertHint }} />
               )}
             <span 
               className="font-semibold"
-              style={{ color: longTermData.stability_analysis.is_stable ? COLORS.primary : '#dc2626' }}
+              style={{ color: longTermData.stability_analysis.is_stable ? COLORS.primary : COLORS.alertHint }}
             >
               System is {longTermData.stability_analysis.is_stable ? 'STABLE' : 'UNSTABLE'}
             </span>
@@ -130,11 +116,10 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="grid grid-cols-4 gap-4 items-center py-3 rounded-lg px-4"
+              className="grid grid-cols-4 gap-4 items-center py-3 rounded-md px-4"
               style={{ backgroundColor: COLORS.light }}
             >
-              <div className="flex items-center gap-2 text-gray-700 font-medium">
-                <item.icon className="w-4 h-4" style={{ color: COLORS.secondary }} />
+              <div className="text-gray-700 font-medium">
                 {item.label}
               </div>
               <div className="text-center font-semibold" style={{ color: COLORS.primary }}>
@@ -146,9 +131,9 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
               <div className="text-center">
                 {diffPct !== '--' && (
                   <span 
-                    className="px-2 py-1 rounded-full text-xs font-medium"
+                    className="px-2 py-1 rounded text-xs font-medium"
                     style={{ 
-                      backgroundColor: parseFloat(diffPct) < 10 ? COLORS.light : COLORS.accent,
+                      backgroundColor: parseFloat(diffPct) < 10 ? '#eef2f5' : COLORS.accent,
                       color: COLORS.primary
                     }}
                   >
@@ -178,7 +163,7 @@ export default function ComparisonSection({ theoreticalData, simulatedData, long
                 {longTermData.steady_state_probabilities.waiting_required}%
               </p>
             </div>
-            <div className="p-4 rounded-xl border border-gray-100" style={{ backgroundColor: COLORS.accent }}>
+            <div className="p-4 rounded-xl border border-gray-100" style={{ backgroundColor: '#eef2f5' }}>
               <p className="text-xs text-gray-500 mb-1">Congestion</p>
               <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
                 {longTermData.steady_state_probabilities.congestion}%

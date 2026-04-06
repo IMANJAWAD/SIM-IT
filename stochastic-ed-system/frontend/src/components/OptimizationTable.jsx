@@ -95,7 +95,7 @@ const OptimizationTable = ({ data = defaultData }) => {
                 key={col.key}
                 onClick={() => col.sortable && handleSort(col.key)}
                 className={`px-3 py-2 text-left text-xs font-semibold text-gray-600 whitespace-nowrap ${
-                  col.sortable ? 'cursor-pointer hover:text-[#0077b6] transition-colors' : ''
+                  col.sortable ? 'cursor-pointer hover:text-[#385a70] transition-colors' : ''
                 }`}
               >
                 <div className="flex items-center gap-1">
@@ -117,7 +117,7 @@ const OptimizationTable = ({ data = defaultData }) => {
               className={`
                 border-b border-gray-100 transition-colors text-sm
                 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}
-                ${row.isBest ? 'bg-[#0077b6]/5 border-l-2 border-l-[#0077b6]' : ''}
+                ${row.isBest ? 'bg-[#385a70]/5 border-l-2 border-l-[#385a70]' : ''}
                 hover:bg-gray-100/50
               `}
             >
@@ -125,7 +125,7 @@ const OptimizationTable = ({ data = defaultData }) => {
                 <div className="flex items-center gap-2">
                   {row.config}
                   {row.isBest && (
-                    <span className="px-1.5 py-0.5 bg-[#0077b6] text-white text-[10px] rounded font-medium">
+                    <span className="px-1.5 py-0.5 bg-[#385a70] text-white text-[10px] rounded font-medium">
                       BEST
                     </span>
                   )}
@@ -134,12 +134,12 @@ const OptimizationTable = ({ data = defaultData }) => {
               <td className="px-3 py-2 text-gray-700">{row.avgLOS.toFixed(1)}</td>
               <td className="px-3 py-2 text-gray-700">{row.avgConsultWait.toFixed(1)}</td>
               <td className="px-3 py-2 text-gray-700">{row.avgDiagWait.toFixed(1)}</td>
-              <td className="px-3 py-2 text-[#0077b6] font-medium">{row.throughput.toFixed(1)}</td>
+              <td className="px-3 py-2 text-[#385a70] font-medium">{row.throughput.toFixed(1)}</td>
               <td className="px-3 py-2">
                 <div className="flex items-center gap-2">
                   <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-[#0077b6] rounded-full"
+                      className="h-full bg-[#385a70] rounded-full"
                       style={{ width: `${row.doctorUtil}%` }}
                     />
                   </div>
@@ -150,7 +150,7 @@ const OptimizationTable = ({ data = defaultData }) => {
                 <div className="flex items-center gap-2">
                   <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-[#00b4d8] rounded-full"
+                      className="h-full bg-[#5f7c8d] rounded-full"
                       style={{ width: `${row.xrayUtil}%` }}
                     />
                   </div>

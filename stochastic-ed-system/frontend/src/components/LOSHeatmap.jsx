@@ -15,18 +15,18 @@ const defaultHeatmapData = {
 const getHeatmapColor = (value, min, max) => {
   const ratio = (value - min) / (max - min);
   
-  // Gradient: #caf0f8 (low) -> #00b4d8 (mid) -> #0077b6 (high)
+  // Gradient: light gray-blue (low) -> muted blue (mid) -> deep slate (high)
   if (ratio < 0.5) {
-    // From #caf0f8 to #00b4d8
-    const r = Math.round(202 + (0 - 202) * (ratio * 2));
-    const g = Math.round(240 + (180 - 240) * (ratio * 2));
-    const b = Math.round(248 + (216 - 248) * (ratio * 2));
+    // From #eef3f7 to #8aa1b1
+    const r = Math.round(238 + (138 - 238) * (ratio * 2));
+    const g = Math.round(243 + (161 - 243) * (ratio * 2));
+    const b = Math.round(247 + (177 - 247) * (ratio * 2));
     return `rgb(${r}, ${g}, ${b})`;
   } else {
-    // From #00b4d8 to #0077b6
-    const r = Math.round(0 + (0 - 0) * ((ratio - 0.5) * 2));
-    const g = Math.round(180 + (119 - 180) * ((ratio - 0.5) * 2));
-    const b = Math.round(216 + (182 - 216) * ((ratio - 0.5) * 2));
+    // From #8aa1b1 to #385a70
+    const r = Math.round(138 + (56 - 138) * ((ratio - 0.5) * 2));
+    const g = Math.round(161 + (90 - 161) * ((ratio - 0.5) * 2));
+    const b = Math.round(177 + (112 - 177) * ((ratio - 0.5) * 2));
     return `rgb(${r}, ${g}, ${b})`;
   }
 };
@@ -110,7 +110,7 @@ const LOSHeatmap = ({
           <div 
             className="w-4 h-24 rounded"
             style={{
-              background: 'linear-gradient(to bottom, #0077b6, #00b4d8, #caf0f8)'
+              background: 'linear-gradient(to bottom, #385a70, #8aa1b1, #eef3f7)'
             }}
           />
           <span className="text-[10px] text-gray-500">Low</span>
