@@ -634,34 +634,6 @@ export default function PriorityQueueResults() {
                   </div>
                 </div>
               </div>
-
-              {/* Mathematical Validation */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
-                <h3 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
-                  <Calculator className="w-5 h-5" />
-                  Mathematical Validation
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-700">
-                  <div>
-                    <div className="font-semibold mb-2">Theoretical Model:</div>
-                    <ul className="space-y-1">
-                      <li>• M/M/c Priority Queue</li>
-                      <li>• {results?.parameters?.preemptive ? 'Preemptive' : 'Non-preemptive'} discipline</li>
-                      <li>• Poisson arrivals, Exponential service</li>
-                      <li>• 5-level priority system</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <div className="font-semibold mb-2">Simulation Validation:</div>
-                    <ul className="space-y-1">
-                      <li>• SimPy discrete-event simulation</li>
-                      <li>• Monte Carlo with {results?.simulation?.num_replications} replications</li>
-                      <li>• 95% confidence intervals</li>
-                      <li>• Statistical convergence verified</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
 

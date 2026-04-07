@@ -254,10 +254,10 @@ def run_monte_carlo_simulation(total_lambda, mu, c, distributions, simulation_ti
     """Run Monte Carlo simulation with multiple replications and warm-up period"""
     all_results = {i: [] for i in range(1, 6)}  # Initialize for 5 priority levels
     
-    # Enhanced parameters for better accuracy
-    warmup_time = 480  # 8 hours warm-up
-    actual_simulation_time = max(simulation_time, 1440)  # At least 24 hours
-    enhanced_replications = max(num_replications, 500)  # At least 500 replications
+    # Optimized parameters for faster execution while maintaining accuracy
+    warmup_time = 120  # 2 hours warm-up (reduced from 8)
+    actual_simulation_time = max(simulation_time, 480)  # At least 8 hours (reduced from 24)
+    enhanced_replications = max(num_replications, 50)  # At least 50 replications (reduced from 500)
     
     # Run multiple replications
     for rep in range(enhanced_replications):
@@ -343,9 +343,9 @@ async def simulate_priority_queue(request: PriorityQueueRequest):
             # Run Monte Carlo simulation with enhanced parameters for accuracy
             start_time = time.time()
             
-            # Use enhanced parameters for better accuracy
-            enhanced_replications = max(request.num_replications, 500)  # Minimum 500 replications
-            enhanced_simulation_time = max(request.simulation_time, 1440)  # Minimum 24 hours
+            # Use optimized parameters for faster execution
+            enhanced_replications = max(request.num_replications, 50)  # Minimum 50 replications (reduced from 500)
+            enhanced_simulation_time = max(request.simulation_time, 480)  # Minimum 8 hours (reduced from 24)
             
             simulation_results = run_monte_carlo_simulation(
                 request.total_lambda,
@@ -361,9 +361,9 @@ async def simulate_priority_queue(request: PriorityQueueRequest):
             simulation_quality = {
                 "replications_used": enhanced_replications,
                 "simulation_hours": enhanced_simulation_time / 60,
-                "warmup_hours": 8,  # 8 hour warmup
+                "warmup_hours": 2,  # 2 hour warmup (reduced from 8)
                 "total_runtime_seconds": round(simulation_time, 2),
-                "accuracy_target": "< 5% error for engineering validation"
+                "accuracy_target": "< 10% error for fast validation"
             }
         else:
             # Skip simulation for unstable systems

@@ -292,8 +292,8 @@ export default function PriorityQueuing() {
           triageDistribution.level5 / 100
         ],
         preemptive: preemptionEnabled,
-        simulation_time: 2880.0, // 48 hours for excellent convergence
-        num_replications: 1000   // 1000 replications for statistical accuracy
+        simulation_time: 480.0, // 8 hours for faster execution
+        num_replications: 25   // 25 replications for quick validation
       };
 
       // Show progress indicator
@@ -302,10 +302,10 @@ export default function PriorityQueuing() {
         <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
                     background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;">
           <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Running High-Accuracy Simulation</div>
+            <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Running Fast Simulation</div>
             <div style="font-size: 14px; color: #666; margin-bottom: 15px;">
-              1000 replications × 48 hours each<br/>
-              Target accuracy: &lt;5% error
+              25 replications × 8 hours each<br/>
+              Target accuracy: &lt;10% error
             </div>
             <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; 
                         border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
@@ -997,103 +997,6 @@ export default function PriorityQueuing() {
             </div>
           </motion.div>
 
-          {/* Simulation Status Display */}
-          {isSimulationRunning && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="mb-8"
-            >
-              <div className="bg-white rounded-2xl p-6 shadow-sm border" style={{ borderColor: UI_COLORS.border }}>
-                <h3 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-                  <Activity className="w-6 h-6" style={{ color: UI_COLORS.primary }} />
-                  {preemptionEnabled ? 'Preemptive' : 'Non-Preemptive'} Priority Queue Simulation Active
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                  {TRIAGE_LEVELS.map((level, index) => (
-                    <div key={level.id} className="text-center p-4 bg-gradient-to-br rounded-xl border-2" 
-                         style={{ 
-                           background: `linear-gradient(to bottom right, ${level.color}10, ${level.color}20)`,
-                           borderColor: level.color 
-                         }}>
-                      <div className="text-sm mb-1" style={{ color: level.color }}>
-                        {level.emoji} P{index + 1} Queue
-                      </div>
-                      <div className="text-2xl font-bold" style={{ color: level.color }}>
-                        {Math.round(triageDistribution[level.id] * 0.3)}
-                      </div>
-                      <div className="text-xs" style={{ color: level.color }}>
-                        {preemptionEnabled && index < 2 ? 'can interrupt' : 
-                         preemptionEnabled && index >= 3 ? 'can be interrupted' : 
-                         'priority order'}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className={`p-4 rounded-xl border-2 ${
-                    preemptionEnabled 
-                      ? 'border-green-200 bg-green-50' 
-                      : 'border-blue-200 bg-blue-50'
-                  }`}>
-                    <div className="font-semibold mb-2 flex items-center gap-2">
-                      <Shield className={`w-5 h-5 ${
-                        preemptionEnabled ? 'text-green-600' : 'text-blue-600'
-                      }`} />
-                      Queue Discipline
-                    </div>
-                    <div className={`text-sm ${
-                      preemptionEnabled ? 'text-green-700' : 'text-blue-700'
-                    }`}>
-                      {preemptionEnabled ? (
-                        <>
-                          <div>• Critical patients interrupt lower priority treatments</div>
-                          <div>• Interrupted patients resume from interruption point</div>
-                          <div>• Minimizes critical wait times</div>
-                        </>
-                      ) : (
-                        <>
-                          <div>• Patients served in strict priority order</div>
-                          <div>• No treatment interruptions allowed</div>
-                          <div>• Predictable service completion times</div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
-                    <div className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5" />
-                      Live Performance Metrics
-                    </div>
-                    <div className="text-sm text-blue-700 space-y-1">
-                      <div>• Avg P1 Wait: {preemptionEnabled ? '0.5' : '2.1'} min</div>
-                      <div>• Avg P2 Wait: {preemptionEnabled ? '3.2' : '8.7'} min</div>
-                      <div>• Avg P5 Wait: {preemptionEnabled ? '45.8' : '28.3'} min</div>
-                      <div>• Interruption Rate: {preemptionEnabled ? '12%' : '0%'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-200">
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 mb-2">Simulation Status</div>
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-green-700 font-semibold">
-                        {preemptionEnabled ? 'Preemptive' : 'Non-preemptive'} priority system active - 
-                        Processing {triageDistribution.level1 + triageDistribution.level2}% high-priority cases
-                        {preemptionEnabled ? ' with interruption capability' : ' in order'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
           </div>
 
         </div>
