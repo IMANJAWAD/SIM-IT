@@ -485,6 +485,82 @@ export default function JacksonResult() {
               </div>
             </div>
           </motion.div>
+          {/* System Crash Alert */}
+          {currentTimePoint && currentTimePoint.system_metrics?.peak_utilization > 100 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="mb-8 rounded-3xl shadow-2xl border-2 p-6"
+              style={{ 
+                background: `linear-gradient(135deg, ${COLORS.danger}, #a91b0d)`, 
+                borderColor: COLORS.danger,
+                boxShadow: `0 20px 40px -10px ${COLORS.danger}60`
+              }}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="p-3 rounded-full bg-white"
+                >
+                  <AlertTriangle className="w-8 h-8" style={{ color: COLORS.danger }} />
+                </motion.div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-1">🚨 SYSTEM CRASHED 🚨</h2>
+                  <p className="text-red-100 text-lg">Alert: Bottleneck Detected!</p>
+                </div>
+              </div>
+              
+              <div className="bg-white bg-opacity-20 rounded-xl p-4 mb-4">
+                <p className="text-white font-semibold text-lg leading-relaxed">
+                  System has crashed due to excessive load. Please increase the number of servers or reduce the arrival rate to stabilize the network.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white bg-opacity-15 rounded-xl p-4">
+                  <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5" />
+                    Critical Metrics
+                  </h3>
+                  <div className="space-y-2 text-white">
+                    <div className="flex justify-between">
+                      <span>Peak Utilization:</span>
+                      <span className="font-bold text-yellow-300">
+                        {(currentTimePoint.system_metrics?.peak_utilization || 0).toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>System Status:</span>
+                      <span className="font-bold text-red-300">OVERLOADED</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-white bg-opacity-15 rounded-xl p-4">
+                  <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    Recommended Actions
+                  </h3>
+                  <ul className="text-white text-sm space-y-1">
+                    <li>• Add more servers to bottleneck departments</li>
+                    <li>• Reduce external arrival rate</li>
+                    <li>• Optimize routing probabilities</li>
+                    <li>• Increase service rates (μ)</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Current System Status */}
           {currentTimePoint && (
             <motion.div
@@ -503,10 +579,19 @@ export default function JacksonResult() {
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
-                    <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
+                    <p className="text-2xl font-bold" style={{ 
+                      color: (currentTimePoint.system_metrics?.peak_utilization || 0) > 100 
+                        ? COLORS.danger 
+                        : COLORS.alertHint 
+                    }}>
                     {(currentTimePoint.system_metrics?.peak_utilization || 0).toFixed(2)}%
                   </p>
                     <p className="text-sm" style={{ color: COLORS.textMuted }}>Peak Utilization</p>
+                    {(currentTimePoint.system_metrics?.peak_utilization || 0) > 100 && (
+                      <p className="text-xs font-bold mt-1" style={{ color: COLORS.danger }}>
+                        SYSTEM CRASHED
+                      </p>
+                    )}
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white shadow-sm">
                     <p className="text-2xl font-bold" style={{ color: COLORS.success }}>
@@ -722,6 +807,26 @@ export default function JacksonResult() {
               style={{ borderColor: COLORS.border }}
             >
               <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.textDark }}>Simulation Summary</h2>
+              
+              {/* System Crash Alert for Summary */}
+              {(jacksonResults.simulation_summary.final_peak_utilization || 0) > 100 && (
+                <div className="mb-6 p-4 rounded-xl border-2" style={{ 
+                  background: `linear-gradient(135deg, ${COLORS.danger}15, ${COLORS.danger}25)`,
+                  borderColor: COLORS.danger 
+                }}>
+                  <div className="flex items-center gap-3 mb-2">
+                    <AlertTriangle className="w-6 h-6" style={{ color: COLORS.danger }} />
+                    <h3 className="font-bold text-lg" style={{ color: COLORS.danger }}>
+                      FINAL SYSTEM STATE: CRASHED
+                    </h3>
+                  </div>
+                  <p className="text-sm" style={{ color: COLORS.danger }}>
+                    The simulation ended with the system in a crashed state due to excessive utilization. 
+                    This indicates that the current configuration cannot handle the patient load sustainably.
+                  </p>
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-4 rounded-xl bg-gray-50">
                   <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>
@@ -730,14 +835,34 @@ export default function JacksonResult() {
                   <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Avg Utilization</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-50">
-                  <p className="text-2xl font-bold" style={{ color: COLORS.alertHint }}>
+                  <p className="text-2xl font-bold" style={{ 
+                    color: (jacksonResults.simulation_summary.final_peak_utilization || 0) > 100 
+                      ? COLORS.danger 
+                      : COLORS.alertHint 
+                  }}>
                     {(jacksonResults.simulation_summary.final_peak_utilization || 0).toFixed(2)}%
                   </p>
                   <p className="text-sm" style={{ color: COLORS.textMuted }}>Final Peak Utilization</p>
+                  {(jacksonResults.simulation_summary.final_peak_utilization || 0) > 100 && (
+                    <div className="mt-2 px-3 py-1 rounded-lg" style={{ 
+                      background: COLORS.danger, 
+                      color: 'white' 
+                    }}>
+                      <p className="text-xs font-bold">CRASHED</p>
+                    </div>
+                  )}
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-50">
-                  <p className="text-2xl font-bold" style={{ color: jacksonResults.simulation_summary.system_stability === 'Stable' ? COLORS.success : COLORS.alertHint }}>
-                    {jacksonResults.simulation_summary.system_stability}
+                  <p className="text-2xl font-bold" style={{ 
+                    color: (jacksonResults.simulation_summary.final_peak_utilization || 0) > 100 
+                      ? COLORS.danger 
+                      : jacksonResults.simulation_summary.system_stability === 'Stable' 
+                        ? COLORS.success 
+                        : COLORS.alertHint 
+                  }}>
+                    {(jacksonResults.simulation_summary.final_peak_utilization || 0) > 100 
+                      ? 'CRASHED' 
+                      : jacksonResults.simulation_summary.system_stability}
                   </p>
                   <p className="text-sm" style={{ color: COLORS.textMuted }}>System Status</p>
                 </div>

@@ -494,6 +494,11 @@ export default function JacksonNetwork() {
     );
   }, [routingMatrix]);
 
+  // Check if any row has invalid sum (> 1.0)
+  const hasInvalidRows = useMemo(() => {
+    return rowSums.some(sum => sum > 1.0);
+  }, [rowSums]);
+
   // Get current network metrics for display
   const getNodeMetrics = (nodeId) => {
     if (!networkMetrics) return null;
@@ -1127,9 +1132,7 @@ export default function JacksonNetwork() {
                   <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: COLORS.textDark }}>
                     Hospital Network Setup
                   </h1>
-                  <p className="text-lg max-w-xl" style={{ color: COLORS.textMuted }}>
-                    Configure hospital departments, routing probabilities, and service parameters for Jackson Network simulation
-                  </p>
+                 
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -1153,15 +1156,15 @@ export default function JacksonNetwork() {
                   
                   <motion.button
                     onClick={startSimulation}
-                    whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                    whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                    disabled={isLoading}
+                    whileHover={{ scale: (isLoading || hasInvalidRows) ? 1 : 1.02 }}
+                    whileTap={{ scale: (isLoading || hasInvalidRows) ? 1 : 0.98 }}
+                    disabled={isLoading || hasInvalidRows}
                     className="px-8 py-4 rounded-xl font-semibold flex items-center gap-3 text-white shadow-lg transition-all"
                     style={{ 
-                      background: isLoading 
+                      background: (isLoading || hasInvalidRows)
                         ? `linear-gradient(135deg, #6b7280, #9ca3af)` 
                         : `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
-                      cursor: isLoading ? 'not-allowed' : 'pointer'
+                      cursor: (isLoading || hasInvalidRows) ? 'not-allowed' : 'pointer'
                     }}
                   >
                     {isLoading ? (
@@ -1172,6 +1175,11 @@ export default function JacksonNetwork() {
                           className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                         />
                         Running DES...
+                      </>
+                    ) : hasInvalidRows ? (
+                      <>
+                        <AlertCircle className="w-5 h-5" />
+                        Fix Matrix Errors
                       </>
                     ) : (
                       <>
@@ -1286,8 +1294,7 @@ export default function JacksonNetwork() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold" style={{ color: COLORS.textDark }}>Network Visualization</h2>
-                  <p style={{ color: COLORS.textMuted }}>Click on nodes to configure department parameters</p>
-                </div>
+                                </div>
                 <div className="flex items-center gap-4 text-xs">
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-full" style={{ background: COLORS.success }} />
@@ -1368,7 +1375,7 @@ export default function JacksonNetwork() {
                           {dept}
                         </th>
                       ))}
-                      <th className="p-3 text-center font-semibold" style={{ color: COLORS.textDark }}>Total</th>
+                      <th className="p-3 text-center font-semibold" style={{ color: COLORS.textDark }}>Exit Probability</th>
                       <th className="p-3 text-center font-semibold" style={{ color: COLORS.textDark }}>Status</th>
                     </tr>
                   </thead>
@@ -1404,17 +1411,21 @@ export default function JacksonNetwork() {
                             </td>
                           ))}
                           <td className="p-3 text-center">
-                            <span 
-                              className={`px-3 py-1 rounded-lg font-bold text-sm ${
-                                isInvalid 
-                                  ? 'bg-red-100 text-red-700' 
-                                  : isComplete 
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-yellow-100 text-yellow-700'
-                              }`}
-                            >
-                              {rowSum.toFixed(2)}
-                            </span>
+                            {isInvalid ? (
+                              <span className="px-3 py-1 rounded-lg font-bold text-sm bg-red-100 text-red-700">
+                                Error: {rowSum.toFixed(2)}
+                              </span>
+                            ) : (
+                              <span 
+                                className={`px-3 py-1 rounded-lg font-bold text-sm ${
+                                  isComplete 
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-green-100 text-green-700'
+                                }`}
+                              >
+                                {isComplete ? '0.00' : (1 - rowSum).toFixed(2)}
+                              </span>
+                            )}
                           </td>
                           <td className="p-3 text-center">
                             {isInvalid ? (
@@ -1452,21 +1463,21 @@ export default function JacksonNetwork() {
                     <div className="w-2 h-2 rounded-full mt-2" style={{ background: COLORS.success }} />
                     <div>
                       <p className="font-medium" style={{ color: COLORS.textDark }}>Valid Row (Sum = 1.0)</p>
-                      <p className="text-gray-600">All patients accounted for</p>
+                      <p className="text-gray-600">All patients accounted for, Exit Probability: 0.0</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full mt-2" style={{ background: COLORS.warning }} />
                     <div>
                       <p className="font-medium" style={{ color: COLORS.textDark }}>Exit Path (Sum &lt; 1.0)</p>
-                      <p className="text-gray-600">Patients can leave the system</p>
+                      <p className="text-gray-600">Patients can leave the system, Exit Probability shown</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full mt-2" style={{ background: COLORS.danger }} />
                     <div>
                       <p className="font-medium" style={{ color: COLORS.textDark }}>Invalid Row (Sum &gt; 1.0)</p>
-                      <p className="text-gray-600">Probability cannot exceed 100%</p>
+                      <p className="text-gray-600">Probability cannot exceed 100% - Simulation disabled</p>
                     </div>
                   </div>
                 </div>
