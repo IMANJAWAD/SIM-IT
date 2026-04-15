@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import logoSp from '../assets/logo-sp.png';
 
@@ -18,9 +18,9 @@ export default function Navbar() {
 
   const afterLoginLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Markov-Monte Sim', path: '/dashboard' },
     { name: 'Jackson Model', path: '/jackson-network' },
-    { name: 'Poisson Process', path: '/poisson-process' },
+    { name: 'NHPP', path: '/poisson-process' },
     { name: 'Priority Queuing', path: '/priority-queuing' },
     { name: 'About', path: '/about' },
   ];

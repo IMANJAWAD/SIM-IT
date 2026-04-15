@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { 
   ArrowLeft, 
   Activity, 
@@ -75,15 +75,13 @@ export default function PriorityQueueResults() {
       try {
         const parsedResults = JSON.parse(storedResults);
         setResults(parsedResults);
-        setLoading(false);
-      } catch (err) {
+      } catch {
         setError('Failed to parse stored results');
-        setLoading(false);
       }
     } else {
       setError('No simulation results found. Please run a simulation first.');
-      setLoading(false);
     }
+    setLoading(false);
   }, []);
 
   const goBack = () => {

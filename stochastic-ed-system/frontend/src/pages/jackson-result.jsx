@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import ReactFlow, {
   Background,
   Controls,
@@ -188,7 +188,7 @@ export default function JacksonResult() {
   const [timeSeriesData, setTimeSeriesData] = useState([]);
   const [currentTimeIndex, setCurrentTimeIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(500); // ms between updates
+  const [playbackSpeed] = useState(500); // ms between updates
   
   // Chart data
   const [analyticsData, setAnalyticsData] = useState({
@@ -216,31 +216,6 @@ export default function JacksonResult() {
       navigate('/jackson-network');
     }
   }, [location.state, navigate]);
-
-  // Auto-play simulation
-  useEffect(() => {
-    if (!isPlaying || !timeSeriesData.length) return;
-
-    const interval = setInterval(() => {
-      setCurrentTimeIndex(prev => {
-        const nextIndex = prev + 1;
-        if (nextIndex >= timeSeriesData.length) {
-          setIsPlaying(false);
-          return prev;
-        }
-        
-        // Update hospital data and charts
-        const currentTimePoint = timeSeriesData[nextIndex];
-        if (currentTimePoint && currentTimePoint.nodes) {
-          updateVisualizationData(currentTimePoint);
-        }
-        
-        return nextIndex;
-      });
-    }, playbackSpeed);
-
-    return () => clearInterval(interval);
-  }, [isPlaying, timeSeriesData, playbackSpeed]);
 
   // Update visualization data
   const updateVisualizationData = useCallback((timePoint) => {
@@ -279,6 +254,31 @@ export default function JacksonResult() {
       ].slice(-20)
     }));
   }, [hospitalData]);
+
+  // Auto-play simulation
+  useEffect(() => {
+    if (!isPlaying || !timeSeriesData.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentTimeIndex(prev => {
+        const nextIndex = prev + 1;
+        if (nextIndex >= timeSeriesData.length) {
+          setIsPlaying(false);
+          return prev;
+        }
+        
+        // Update hospital data and charts
+        const currentTimePoint = timeSeriesData[nextIndex];
+        if (currentTimePoint && currentTimePoint.nodes) {
+          updateVisualizationData(currentTimePoint);
+        }
+        
+        return nextIndex;
+      });
+    }, playbackSpeed);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, timeSeriesData, playbackSpeed, updateVisualizationData]);
 
   // Jump to specific time point
   const jumpToTimePoint = (index) => {
@@ -432,9 +432,7 @@ export default function JacksonResult() {
                   
                   <div>
                     <h1 className="text-3xl font-bold" style={{ color: COLORS.textDark }}>Jackson Network Results</h1>
-                    <p style={{ color: COLORS.textMuted }}>
-                      Live simulation with {timeSeriesData.length} time points over {jacksonResults.simulation_config?.duration_minutes || 0} minutes
-                    </p>
+                    
                   </div>
                 </div>
                 
