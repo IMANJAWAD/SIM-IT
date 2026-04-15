@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../utils/api';
 import { 
   Heart, 
   Siren, 
